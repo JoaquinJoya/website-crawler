@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border-color: #27272a;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .main-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .ai-config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .ai-config-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ai-config-item.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-input[rows] {
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .option-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .option-card:hover {
+            border-color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .option-card.active {
+            border-color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--accent-color);
+        }
+        
+        .option-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        
+        .option-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+        
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            margin: 2rem 0;
+        }
+        
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-detail {
+            color: var(--success-color);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        
+        .results-container {
+            display: none;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .count-badge {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .urls-grid {
+            display: grid;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        
+        .url-item {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 2px);
+            transition: all 0.2s;
+        }
+        
+        .url-item:hover {
+            border-color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .url-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 0.875rem;
+        }
+        
+        .url-link:hover {
+            text-decoration: underline;
+        }
+        
+        .page-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .page-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: all 0.2s;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .page-header {
+            margin-bottom: 1rem;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-url {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            word-break: break-all;
+        }
+        
+        .page-url a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        
+        .page-url a:hover {
+            text-decoration: underline;
+        }
+        
+        .content-sections {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .content-section {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 2px);
+            padding: 1rem;
+        }
+        
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .content-header > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .content-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .content-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.875rem;
+        }
+        
+        .content-preview {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: calc(var(--radius) - 4px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .content-full {
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: calc(var(--radius) - 4px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 0.75rem;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+        }
+        
+        .error-container {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .error-text {
+            color: var(--error-color);
+            font-weight: 500;
+        }
+        
+        .paragraph-item, .link-item, .image-item {
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: calc(var(--radius) - 4px);
+            margin-bottom: 0.5rem;
+        }
+        
+        .paragraph-item:last-child, .link-item:last-child, .image-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .link-item a, .image-item a {
+            color: var(--accent-color);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .link-item a:hover, .image-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .ai-section {
+            border-left: 4px solid var(--success-color) !important;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .ai-section .content-title {
+            color: var(--success-color);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .main-card {
+                padding: 1.5rem;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .navbar {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">WebCrawler Pro</div>
+            <div class="status-badge">Beta</div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Intelligent Web Crawler</h1>
+            <p>Extract structured content from any website with advanced real-time crawling technology</p>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="main-card">
+            <form id="crawlForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="url" class="form-label">Target URL</label>
+                    <input type="url" id="url" name="url" class="form-input" placeholder="https://example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Crawl Limits (Optional)</label>
+                    <div class="ai-config-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="ai-config-item">
+                            <label for="maxPages" class="form-label">Max Pages</label>
+                            <input type="number" id="maxPages" class="form-input" placeholder="e.g., 50 (empty = unlimited)" min="1">
+                        </div>
+                        
+                        <div class="ai-config-item">
+                            <label for="maxDepth" class="form-label">Max Depth Level</label>
+                            <input type="number" id="maxDepth" class="form-input" placeholder="e.g., 3 (empty = unlimited)" min="1">
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                        <strong>Max Pages:</strong> Stop crawling after reaching this number of pages<br>
+                        <strong>Max Depth:</strong> Limit how many levels deep to crawl from the starting URL<br>
+                        <em>Leave both empty to crawl the entire website</em>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">AI Processing Configuration</label>
+                    <div class="ai-config-grid">
+                        <div class="ai-config-item">
+                            <label for="aiProvider" class="form-label">AI Provider</label>
+                            <select id="aiProvider" class="form-input">
+                                <option value="">No AI Processing</option>
+                                <option value="openai">OpenAI (GPT)</option>
+                                <option value="claude">Anthropic (Claude)</option>
+                                <option value="gemini">Google (Gemini)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ai-config-item">
+                            <label for="aiModel" class="form-label">Model</label>
+                            <input type="text" id="aiModel" class="form-input" placeholder="e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-1.5-flash">
+                        </div>
+                        
+                        <div class="ai-config-item">
+                            <label for="aiApiKey" class="form-label">API Key</label>
+                            <input type="password" id="aiApiKey" class="form-input" placeholder="Enter your API key">
+                        </div>
+                        
+                        <div class="ai-config-item full-width">
+                            <label for="aiPrompt" class="form-label">AI Prompt</label>
+                            <textarea id="aiPrompt" class="form-input" rows="3" placeholder="Enter your prompt for AI analysis of each page (e.g., 'Analyze this webpage content and extract key insights about the company's products and services')"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Content Selector (Optional)</label>
+                    <div class="ai-config-grid">
+                        <div class="ai-config-item">
+                            <label for="targetType" class="form-label">Selector Type</label>
+                            <select id="targetType" class="form-input">
+                                <option value="">Full Page (Default)</option>
+                                <option value="id">By ID</option>
+                                <option value="class">By Class</option>
+                                <option value="tag">By Tag</option>
+                                <option value="custom">Custom CSS Selector</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ai-config-item">
+                            <label for="targetSelector" class="form-label">Selector Value</label>
+                            <input type="text" id="targetSelector" class="form-input" placeholder="e.g., main-content, article, .content">
+                        </div>
+                        
+                        <div class="ai-config-item">
+                            <label for="targetMode" class="form-label">Extraction Mode</label>
+                            <select id="targetMode" class="form-input">
+                                <option value="content">Content Inside (Default)</option>
+                                <option value="element">Full Element with Tag</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ai-config-item full-width">
+                            <label for="targetDescription" class="form-label">Description (Optional)</label>
+                            <input type="text" id="targetDescription" class="form-input" placeholder="e.g., Main article content, Product details section">
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                        <strong>Examples:</strong><br>
+                        • ID: "main-content" → #main-content<br>
+                        • Class: "article-body" → .article-body<br>
+                        • Tag: "article" → article<br>
+                        • Custom: "div.content > p" → div.content > p<br><br>
+                        <strong>Extraction Modes:</strong><br>
+                        • <strong>Content Inside:</strong> Gets text/HTML inside the element (default)<br>
+                        • <strong>Full Element:</strong> Gets the complete element including the tag itself
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Content Extraction Options</label>
+                    <div class="options-grid">
+                        <div class="option-card" onclick="toggleOption('extractHead')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractHead" class="checkbox" checked>
+                                <div>
+                                    <div class="option-label">Head Metadata</div>
+                                    <div class="option-description">Title, meta tags, SEO data</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card" onclick="toggleOption('extractHTML')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractHTML" class="checkbox" checked>
+                                <div>
+                                    <div class="option-label">Full HTML</div>
+                                    <div class="option-description">Complete HTML source code</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card" onclick="toggleOption('extractText')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractText" class="checkbox" checked>
+                                <div>
+                                    <div class="option-label">Structured Text</div>
+                                    <div class="option-description">Clean, formatted content</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card" onclick="toggleOption('extractMarkdown')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractMarkdown" class="checkbox">
+                                <div>
+                                    <div class="option-label">Markdown</div>
+                                    <div class="option-description">HTML converted to Markdown</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card" onclick="toggleOption('extractHeadings')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractHeadings" class="checkbox">
+                                <div>
+                                    <div class="option-label">Headings</div>
+                                    <div class="option-description">H1-H6 structure analysis</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card" onclick="toggleOption('extractParagraphs')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractParagraphs" class="checkbox">
+                                <div>
+                                    <div class="option-label">Paragraphs</div>
+                                    <div class="option-description">Individual content blocks</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card" onclick="toggleOption('extractLinks')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractLinks" class="checkbox">
+                                <div>
+                                    <div class="option-label">Links & CTAs</div>
+                                    <div class="option-description">Navigation and call-to-actions</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-card" onclick="toggleOption('extractImages')">
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="extractImages" class="checkbox">
+                                <div>
+                                    <div class="option-label">Images</div>
+                                    <div class="option-description">Media assets and metadata</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" id="crawlBtn" class="btn btn-primary" onclick="startCrawl()">
+                    <span id="btnText">Start Intelligent Crawl</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="status-text">Initializing crawler...</div>
+            <div id="crawlStatus" class="status-detail"></div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results" class="results-container">
+            <div class="main-card">
+                <div class="section-header">
+                    <h2 class="section-title">Discovered URLs</h2>
+                    <span id="urlCount" class="count-badge">0 found</span>
+                </div>
+                <div id="urlList" class="urls-grid"></div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="pageContent" class="results-container">
+            <div class="main-card">
+                <div class="section-header">
+                    <h2 class="section-title">Extracted Content</h2>
+                    <span id="pageCount" class="count-badge">0 pages</span>
+                </div>
+                <div id="pageList" class="page-grid"></div>
+            </div>
+        </div>
+
+        <!-- Error Container -->
+        <div id="error" class="error-container">
+            <div class="error-text" id="errorText"></div>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let pageCounter = 0;
+        
+        // Toggle option card and checkbox
+        function toggleOption(id) {
+            const checkbox = document.getElementById(id);
+            const card = checkbox.closest('.option-card');
+            
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        }
+        
+        // Initialize option cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(checkbox => {
+                const card = checkbox.closest('.option-card');
+                if (checkbox.checked) {
+                    card.classList.add('active');
+                }
+            });
+        });
+        
+        function createPageElement(page) {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page-card';
+            
+            if (page.error) {
+                pageDiv.innerHTML = `
+                    <div class="page-header">
+                        <div class="page-title">Error Loading Page</div>
+                        <div class="page-url"><a href="${page.url}" target="_blank">${page.url}</a></div>
+                    </div>
+                    <div class="error-text">${page.error}</div>
+                `;
+            } else {
+                let sectionsHtml = '';
+                
+                // Head data
+                if (page.head_data) {
+                    const headId = 'head-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    sectionsHtml += `<div class="content-section">
+                        <div class="content-header">
+                            <div class="content-title">Head Metadata</div>
+                            <button class="btn btn-secondary" onclick="toggleContent('${headId}')">View</button>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">${Object.keys(page.head_data).length} metadata fields extracted</div>
+                        </div>
+                        <div id="${headId}" class="content-full">${escapeHtml(JSON.stringify(page.head_data, null, 2))}</div>
+                    </div>`;
+                }
+                
+                // Structured text content
+                if (page.content) {
+                    const textId = 'text-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    sectionsHtml += `<div class="content-section">
+                        <div class="content-header">
+                            <div class="content-title">Structured Text</div>
+                            <button class="btn btn-secondary" onclick="toggleContent('${textId}')">View</button>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">${formatMarkdownPreview(page.content.substring(0, 200))}...</div>
+                        </div>
+                        <div id="${textId}" class="content-full">${escapeHtml(page.content)}</div>
+                    </div>`;
+                }
+                
+                // Markdown content
+                if (page.markdown) {
+                    const markdownId = 'md-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    sectionsHtml += `<div class="content-section">
+                        <div class="content-header">
+                            <div class="content-title">Markdown</div>
+                            <button class="btn btn-secondary" onclick="toggleContent('${markdownId}')">View</button>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">HTML converted to Markdown format</div>
+                        </div>
+                        <div id="${markdownId}" class="content-full">${escapeHtml(page.markdown)}</div>
+                    </div>`;
+                }
+                
+                // Headings
+                if (page.headings && page.headings.length > 0) {
+                    const headingsId = 'headings-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    sectionsHtml += `<div class="content-section">
+                        <div class="content-header">
+                            <div class="content-title">Headings</div>
+                            <div>
+                                <span class="count-badge">${page.headings.length}</span>
+                                <button class="btn btn-secondary" onclick="toggleContent('${headingsId}')">View All</button>
+                            </div>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">${page.headings.slice(0, 3).map(h => `• <strong>${h.level}:</strong> ${h.text}`).join('<br>')}</div>
+                        </div>
+                        <div id="${headingsId}" class="content-full">${page.headings.map(h => `<div><strong>${h.level}:</strong> ${escapeHtml(h.text)}</div>`).join('<br>')}</div>
+                    </div>`;
+                }
+                
+                // Paragraphs
+                if (page.paragraphs && page.paragraphs.length > 0) {
+                    const paragraphsId = 'paragraphs-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    sectionsHtml += `<div class="content-section">
+                        <div class="content-header">
+                            <div class="content-title">Paragraphs</div>
+                            <div>
+                                <span class="count-badge">${page.paragraphs.length}</span>
+                                <button class="btn btn-secondary" onclick="toggleContent('${paragraphsId}')">View All</button>
+                            </div>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">${page.paragraphs.slice(0, 2).map(p => `${p.substring(0, 100)}...`).join('<br><br>')}</div>
+                        </div>
+                        <div id="${paragraphsId}" class="content-full">${page.paragraphs.map((p, i) => `<div class="paragraph-item"><strong>Paragraph ${i+1}:</strong><br>${escapeHtml(p)}</div>`).join('<br><br>')}</div>
+                    </div>`;
+                }
+                
+                // Links and CTAs
+                if (page.links && page.links.length > 0) {
+                    const ctas = page.links.filter(l => l.type === 'cta');
+                    const regularLinks = page.links.filter(l => l.type === 'link');
+                    
+                    if (ctas.length > 0) {
+                        const ctasId = 'ctas-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                        sectionsHtml += `<div class="content-section">
+                            <div class="content-header">
+                                <div class="content-title">Call-to-Actions</div>
+                                <div>
+                                    <span class="count-badge">${ctas.length}</span>
+                                    <button class="btn btn-secondary" onclick="toggleContent('${ctasId}')">View All</button>
+                                </div>
+                            </div>
+                            <div class="content-preview">
+                                <div class="content-text">${ctas.slice(0, 3).map(l => `<strong>${l.text}</strong>: ${l.url}`).join('<br>')}</div>
+                            </div>
+                            <div id="${ctasId}" class="content-full">${ctas.map(l => `<div class="link-item"><strong>Text:</strong> ${escapeHtml(l.text)}<br><strong>URL:</strong> <a href="${l.url}" target="_blank">${l.url}</a>${l.title ? `<br><strong>Title:</strong> ${escapeHtml(l.title)}` : ''}</div>`).join('<br><br>')}</div>
+                        </div>`;
+                    }
+                    
+                    if (regularLinks.length > 0) {
+                        const linksId = 'links-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                        sectionsHtml += `<div class="content-section">
+                            <div class="content-header">
+                                <div class="content-title">Links</div>
+                                <div>
+                                    <span class="count-badge">${regularLinks.length}</span>
+                                    <button class="btn btn-secondary" onclick="toggleContent('${linksId}')">View All</button>
+                                </div>
+                            </div>
+                            <div class="content-preview">
+                                <div class="content-text">${regularLinks.slice(0, 3).map(l => `${l.text}: ${l.url}`).join('<br>')}</div>
+                            </div>
+                            <div id="${linksId}" class="content-full">${regularLinks.map(l => `<div class="link-item"><strong>Text:</strong> ${escapeHtml(l.text)}<br><strong>URL:</strong> <a href="${l.url}" target="_blank">${l.url}</a>${l.title ? `<br><strong>Title:</strong> ${escapeHtml(l.title)}` : ''}</div>`).join('<br><br>')}</div>
+                        </div>`;
+                    }
+                }
+                
+                // Images
+                if (page.images && page.images.length > 0) {
+                    const imagesId = 'images-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    sectionsHtml += `<div class="content-section">
+                        <div class="content-header">
+                            <div class="content-title">Images</div>
+                            <div>
+                                <span class="count-badge">${page.images.length}</span>
+                                <button class="btn btn-secondary" onclick="toggleContent('${imagesId}')">View All</button>
+                            </div>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">${page.images.slice(0, 3).map(img => `${img.alt || 'No alt'}: ${img.url}`).join('<br>')}</div>
+                        </div>
+                        <div id="${imagesId}" class="content-full">${page.images.map(img => `<div class="image-item"><strong>URL:</strong> <a href="${img.url}" target="_blank">${img.url}</a>${img.alt ? `<br><strong>Alt:</strong> ${escapeHtml(img.alt)}` : ''}${img.title ? `<br><strong>Title:</strong> ${escapeHtml(img.title)}` : ''}${img.width ? `<br><strong>Dimensions:</strong> ${img.width}x${img.height}` : ''}</div>`).join('<br><br>')}</div>
+                    </div>`;
+                }
+                
+                // AI Analysis
+                if (page.ai_analysis) {
+                    const aiId = 'ai-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    const promptId = 'prompt-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    const promptDisplay = page.ai_prompt ? `<div style="margin-bottom: 1rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid var(--accent-color);"><strong>Prompt Used:</strong><br><em>${escapeHtml(page.ai_prompt)}</em></div>` : '';
+                    sectionsHtml += `<div class="content-section ai-section">
+                        <div class="content-header">
+                            <div class="content-title">🤖 AI Analysis</div>
+                            <div>
+                                ${page.ai_prompt ? `<button class="btn btn-secondary" onclick="toggleContent('${promptId}')" style="margin-right: 0.5rem;">View Full Prompt</button>` : ''}
+                                <button class="btn btn-secondary" onclick="toggleContent('${aiId}')">View Analysis</button>
+                            </div>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">${formatMarkdownPreview(page.ai_analysis.substring(0, 150))}...</div>
+                        </div>
+                        ${page.ai_prompt ? `<div id="${promptId}" class="content-full" style="display: none;"><div style="padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid var(--accent-color);"><strong>Complete Prompt Sent to AI (including crawled data):</strong><br><pre style="white-space: pre-wrap; margin: 0.5rem 0; font-family: inherit; font-size: 0.85rem;">${escapeHtml(page.ai_prompt)}</pre></div></div>` : ''}
+                        <div id="${aiId}" class="content-full">${promptDisplay}${formatMarkdownPreview(page.ai_analysis)}</div>
+                    </div>`;
+                }
+                
+                // Full HTML
+                if (page.html_content) {
+                    const htmlId = 'html-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    sectionsHtml += `<div class="content-section">
+                        <div class="content-header">
+                            <div class="content-title">Full HTML</div>
+                            <button class="btn btn-secondary" onclick="toggleContent('${htmlId}')">View Source</button>
+                        </div>
+                        <div class="content-preview">
+                            <div class="content-text">Complete HTML source code (${Math.round(page.html_content.length / 1024)}KB)</div>
+                        </div>
+                        <div id="${htmlId}" class="content-full">${escapeHtml(page.html_content)}</div>
+                    </div>`;
+                }
+                
+                pageDiv.innerHTML = `
+                    <div class="page-header">
+                        <div class="page-title">${page.title}</div>
+                        <div class="page-url"><a href="${page.url}" target="_blank">${page.url}</a></div>
+                    </div>
+                    <div class="content-sections">
+                        ${sectionsHtml}
+                    </div>
+                `;
+            }
+            
+            return pageDiv;
+        }
+        
+        function toggleContent(id) {
+            const element = document.getElementById(id);
+            const contentHeader = element.parentElement.querySelector('.content-header');
+            const button = contentHeader.querySelector('.btn-secondary');
+            
+            if (element.style.display === 'none' || element.style.display === '') {
+                element.style.display = 'block';
+                button.textContent = 'Hide';
+            } else {
+                element.style.display = 'none';
+                const originalText = button.textContent.includes('All') ? 'View All' : 'View';
+                button.textContent = originalText;
+            }
+        }
+        
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatMarkdownPreview(markdown) {
+            // Simple markdown to HTML converter for preview
+            return markdown
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+                .replace(/^##### (.*$)/gim, '<h5>$1</h5>')
+                .replace(/^###### (.*$)/gim, '<h6>$1</h6>')
+                .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
+                .replace(/^\- (.*$)/gim, '<li>$1</li>')
+                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
+                .replace(/```([\\s\\S]*?)```/gim, '<pre><code>$1</code></pre>')
+                .replace(/\\n\\n/g, '</p><p>')
+                .replace(/^(?!<[h1-6]|<blockquote|<li|<pre)(.+)$/gim, '<p>$1</p>')
+                .replace(/\\n/g, '<br>');
+        }
+        
+        function startCrawl() {
+            const url = document.getElementById('url').value;
+            
+            // Get selected options
+            const options = {
+                head: document.getElementById('extractHead').checked,
+                html: document.getElementById('extractHTML').checked,
+                text: document.getElementById('extractText').checked,
+                markdown: document.getElementById('extractMarkdown').checked,
+                headings: document.getElementById('extractHeadings').checked,
+                paragraphs: document.getElementById('extractParagraphs').checked,
+                links: document.getElementById('extractLinks').checked,
+                images: document.getElementById('extractImages').checked
+            };
+            
+            // Get AI configuration
+            const aiConfig = {
+                provider: document.getElementById('aiProvider').value,
+                model: document.getElementById('aiModel').value,
+                apiKey: document.getElementById('aiApiKey').value,
+                prompt: document.getElementById('aiPrompt').value
+            };
+            
+            // Get target selector configuration
+            const targetConfig = {
+                type: document.getElementById('targetType').value,
+                selector: document.getElementById('targetSelector').value,
+                mode: document.getElementById('targetMode').value,
+                description: document.getElementById('targetDescription').value
+            };
+            
+            // Get crawl limits
+            const crawlLimits = {
+                maxPages: document.getElementById('maxPages').value,
+                maxDepth: document.getElementById('maxDepth').value
+            };
+            
+            // Get UI elements
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const pageContent = document.getElementById('pageContent');
+            const error = document.getElementById('error');
+            const urlList = document.getElementById('urlList');
+            const pageList = document.getElementById('pageList');
+            const crawlStatus = document.getElementById('crawlStatus');
+            const crawlBtn = document.getElementById('crawlBtn');
+            const btnText = document.getElementById('btnText');
+            const urlCount = document.getElementById('urlCount');
+            const pageCount = document.getElementById('pageCount');
+            
+            // Close existing connection
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            // Reset UI
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            pageContent.style.display = 'none';
+            error.style.display = 'none';
+            urlList.innerHTML = '';
+            pageList.innerHTML = '';
+            pageCounter = 0;
+            
+            // Update button state
+            crawlBtn.disabled = true;
+            btnText.textContent = 'Crawling...';
+            
+            // Reset counters
+            urlCount.textContent = '0 found';
+            pageCount.textContent = '0 pages';
+            
+            crawlStatus.textContent = 'Establishing connection...';
+            
+            // Build query string with options, AI config, target selector, and crawl limits
+            const queryParams = new URLSearchParams({
+                url: url,
+                head: options.head,
+                html: options.html,
+                text: options.text,
+                markdown: options.markdown,
+                headings: options.headings,
+                paragraphs: options.paragraphs,
+                links: options.links,
+                images: options.images,
+                ai_provider: aiConfig.provider,
+                ai_model: aiConfig.model,
+                ai_api_key: aiConfig.apiKey,
+                ai_prompt: aiConfig.prompt,
+                target_type: targetConfig.type,
+                target_selector: targetConfig.selector,
+                target_mode: targetConfig.mode,
+                target_description: targetConfig.description,
+                max_pages: crawlLimits.maxPages,
+                max_depth: crawlLimits.maxDepth
+            });
+            
+            // Start SSE connection
+            eventSource = new EventSource(`/stream-crawl?${queryParams}`);
+            
+            eventSource.addEventListener('urls', function(e) {
+                const data = JSON.parse(e.data);
+                crawlStatus.textContent = `Discovered ${data.count} URLs, extracting content...`;
+                
+                // Update URL counter
+                urlCount.textContent = `${data.count} found`;
+                
+                // Add URLs to the grid
+                data.urls.forEach(url => {
+                    const urlDiv = document.createElement('div');
+                    urlDiv.className = 'url-item';
+                    urlDiv.innerHTML = `<a href="${url}" target="_blank" class="url-link">${url}</a>`;
+                    urlList.appendChild(urlDiv);
+                });
+                
+                // Show results
+                results.style.display = 'block';
+                pageContent.style.display = 'block';
+            });
+            
+            eventSource.addEventListener('page', function(e) {
+                const page = JSON.parse(e.data);
+                pageCounter++;
+                
+                crawlStatus.textContent = `Processing: ${page.title || page.url}`;
+                pageCount.textContent = `${pageCounter} pages`;
+                
+                const pageDiv = createPageElement(page);
+                pageList.appendChild(pageDiv);
+                
+                // Smooth scroll to new content
+                pageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            });
+            
+            eventSource.addEventListener('complete', function(e) {
+                const data = JSON.parse(e.data);
+                const processed = data.processed || pageCounter;
+                const total = data.total || pageCounter;
+                
+                if (processed === total) {
+                    crawlStatus.textContent = `✅ Crawling completed! Successfully processed all ${processed} pages.`;
+                } else {
+                    crawlStatus.textContent = `⚠️ Crawling completed with issues: ${processed}/${total} pages processed.`;
+                }
+                
+                loading.style.display = 'none';
+                crawlBtn.disabled = false;
+                btnText.textContent = 'Start Intelligent Crawl';
+                eventSource.close();
+                eventSource = null;
+            });
+            
+            eventSource.addEventListener('error', function(e) {
+                // Only show error if we haven't received any data yet
+                if (pageCounter === 0) {
+                    const errorText = document.getElementById('errorText');
+                    errorText.textContent = 'Connection error. Please check the URL and try again.';
+                    error.style.display = 'block';
+                }
+                loading.style.display = 'none';
+                crawlBtn.disabled = false;
+                btnText.textContent = 'Start Intelligent Crawl';
+                if (eventSource) {
+                    eventSource.close();
+                    eventSource = null;
+                }
+            });
+        }
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+    </script>
+</body>
+</html>
