@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """
 AI Processor Script for Web Crawler
-Handles AI API calls for OpenAI, Claude, and Gemini
+Handles AI API calls for OpenAI, Claude, and Gemini (using new google-genai library)
 Communication via stdin/stdout for fast Go-Python integration
+
+Installation requirements:
+- OpenAI: pip install openai
+- Claude: pip install anthropic  
+- Gemini: pip install google-genai
 """
 
 import json
@@ -64,21 +69,51 @@ def process_claude(payload: Dict[str, Any]) -> str:
         return f"Claude Error: {str(e)}"
 
 def process_gemini(payload: Dict[str, Any]) -> str:
-    """Process content using Google Gemini API"""
+    """Process content using Google Gemini API with new google-genai library"""
     try:
-        import google.generativeai as genai
+        from google import genai
+        from google.genai import types
         
-        genai.configure(api_key=payload["api_key"])
-        model_name = payload["model"] or "gemini-1.5-flash"
+        # Initialize client with API key
+        client = genai.Client(
+            api_key=payload["api_key"]
+        )
         
-        model = genai.GenerativeModel(model_name)
-        prompt = f"{payload['prompt']}\n\nContent to analyze:\n{payload['content']}"
+        # Set model (use new gemini-2.5-flash-preview-05-20 as default)
+        model = payload["model"] or "gemini-2.5-flash-preview-05-20"
         
-        response = model.generate_content(prompt)
-        return response.text.strip()
+        # Prepare the input content
+        input_text = f"{payload['prompt']}\n\nContent to analyze:\n{payload['content']}"
+        
+        # Create content structure for new API
+        contents = [
+            types.Content(
+                role="user",
+                parts=[
+                    types.Part.from_text(text=input_text),
+                ],
+            ),
+        ]
+        
+        # Configure response
+        generate_content_config = types.GenerateContentConfig(
+            response_mime_type="text/plain",
+        )
+        
+        # Generate content using streaming API and collect full response
+        result_text = ""
+        for chunk in client.models.generate_content_stream(
+            model=model,
+            contents=contents,
+            config=generate_content_config,
+        ):
+            if chunk.text:
+                result_text += chunk.text
+        
+        return result_text.strip()
         
     except ImportError:
-        return "Error: Google GenerativeAI library not installed. Run: pip install google-generativeai"
+        return "Error: Google GenAI library not installed. Run: pip install google-genai"
     except Exception as e:
         return f"Gemini Error: {str(e)}"
 

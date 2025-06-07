@@ -40,7 +40,13 @@ Originally built for **hisonrisa dental practice** to monitor their bilingual (E
 
 ### Prerequisites
 - Go 1.19+ installed
+- Python 3.8+ for AI processing
 - Git for version control
+
+### AI Provider Requirements
+- **OpenAI**: `pip install openai`
+- **Claude**: `pip install anthropic`  
+- **Gemini**: `pip install google-genai` (new API)
 
 ### Installation
 ```bash

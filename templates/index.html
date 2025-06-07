@@ -606,7 +606,7 @@
                         
                         <div class="ai-config-item">
                             <label for="aiModel" class="form-label">Model</label>
-                            <input type="text" id="aiModel" class="form-input" placeholder="e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-1.5-flash">
+                            <input type="text" id="aiModel" class="form-input" placeholder="e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-2.5-flash-preview-05-20">
                         </div>
                         
                         <div class="ai-config-item">
@@ -809,13 +809,45 @@
             }
         }
         
-        // Initialize option cards
+        // Initialize option cards and AI provider selector
         document.addEventListener('DOMContentLoaded', function() {
             const checkboxes = document.querySelectorAll('.checkbox');
             checkboxes.forEach(checkbox => {
                 const card = checkbox.closest('.option-card');
                 if (checkbox.checked) {
                     card.classList.add('active');
+                }
+            });
+            
+            // Handle AI provider change
+            const aiProvider = document.getElementById('aiProvider');
+            const aiModel = document.getElementById('aiModel');
+            const aiApiKey = document.getElementById('aiApiKey');
+            
+            aiProvider.addEventListener('change', function() {
+                const provider = this.value;
+                
+                // Update model placeholder and default values
+                switch(provider) {
+                    case 'openai':
+                        aiModel.placeholder = 'e.g., gpt-4o, gpt-4o-mini, gpt-4-turbo';
+                        aiModel.value = '';
+                        aiApiKey.placeholder = 'Enter your OpenAI API key';
+                        break;
+                    case 'claude':
+                        aiModel.placeholder = 'e.g., claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022';
+                        aiModel.value = '';
+                        aiApiKey.placeholder = 'Enter your Anthropic API key';
+                        break;
+                    case 'gemini':
+                        aiModel.placeholder = 'e.g., gemini-2.5-flash-preview-05-20, gemini-1.5-flash';
+                        aiModel.value = 'gemini-2.5-flash-preview-05-20';
+                        aiApiKey.placeholder = 'Enter your Google AI API key (GEMINI_API_KEY)';
+                        break;
+                    default:
+                        aiModel.placeholder = 'e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-2.5-flash-preview-05-20';
+                        aiModel.value = '';
+                        aiApiKey.placeholder = 'Enter your API key';
                 }
             });
         });
