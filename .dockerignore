@@ -1,0 +1,49 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+DEPLOYMENT.md
+debug_crawl.md
+GEMINI_UPDATE.md
+
+# Development files
+.claude/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment files
+.env
+.env.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Cache
+cache/
+baselines/
+
+# Test files
+*_test.go
+test_*.py
+
+# Deployment files (these are used during build)
+# docker-compose.yml
+# Dockerfile
+# deploy.sh

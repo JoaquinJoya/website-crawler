@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  web-crawler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      # Server Configuration
+      - SERVER_PORT=8081
+      - GIN_MODE=release
+      
+      # Crawler Configuration  
+      - COLLY_ENABLED=true
+      - COLLY_USER_AGENT=Mozilla/5.0 (compatible; WebCrawler-Pro/1.0)
+      - COLLY_DELAY=200ms
+      - COLLY_RANDOM_DELAY=100ms
+      - COLLY_PARALLELISM=5
+      - COLLY_RESPECT_ROBOTS_TXT=true
+      - COLLY_CACHE_ENABLED=true
+      - COLLY_CACHE_TTL=24h
+      
+      # Cache Configuration
+      - CACHE_DIR=/app/cache
+      - BASELINE_DIR=/app/baselines
+      
+      # Monitoring Configuration
+      - MONITORING_MULTILANG_ENABLED=true
+      - MONITORING_CHANGE_DETECTION=true
+      - MONITORING_COMPARISON_THRESHOLD=0.1
+      
+      # Rate Limiting
+      - RATE_LIMIT_REQUESTS_PER_MINUTE=300
+      - RATE_LIMIT_BURST=50
+      
+      # Timeouts
+      - HTTP_CLIENT_TIMEOUT=30s
+      - PAGE_FETCH_TIMEOUT=45s
+      - AI_PROCESSING_TIMEOUT=60s
+      
+    volumes:
+      # Persistent cache storage
+      - crawler_cache:/app/cache
+      - crawler_logs:/app/logs
+      - crawler_baselines:/app/baselines
+    
+    restart: unless-stopped
+    
+    # Resource limits for CPX21 server
+    deploy:
+      resources:
+        limits:
+          cpus: '2.5'      # Use 2.5 of 3 vCPUs (reserve 0.5 for system)
+          memory: 3G       # Use 3GB of 4GB RAM (reserve 1GB for system)
+        reservations:
+          cpus: '1.0'      # Guarantee at least 1 vCPU
+          memory: 1G       # Guarantee at least 1GB RAM
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Optional: Reverse proxy with SSL (recommended for production)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - web-crawler
+    restart: unless-stopped
+    profiles:
+      - production  # Only start with --profile production
+
+volumes:
+  crawler_cache:
+    driver: local
+  crawler_logs:
+    driver: local
+  crawler_baselines:
+    driver: local
+  nginx_logs:
+    driver: local
+
+# Networks
+networks:
+  default:
+    driver: bridge
