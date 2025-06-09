@@ -365,6 +365,197 @@
             gap: 1.5rem;
         }
         
+        /* Split Panel Layout */
+        .split-container {
+            display: none; /* Hidden by default, shown when results come in */
+            width: 100%;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 70vh;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        
+        .split-container.active {
+            display: grid;
+        }
+        
+        .left-panel {
+            background: var(--bg-tertiary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            max-height: 70vh;
+        }
+        
+        .left-panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        
+        .left-panel-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-cards-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        
+        .page-card-compact {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+        
+        .page-card-compact:hover {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid var(--accent-color);
+            padding-left: calc(1.5rem - 3px);
+        }
+        
+        .page-card-compact.selected {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--accent-color);
+            padding-left: calc(1.5rem - 3px);
+        }
+        
+        .compact-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .compact-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            word-break: break-all;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .compact-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+        
+        .status-indicator.error {
+            background: var(--error-color);
+        }
+        
+        .status-indicator.ai {
+            background: var(--accent-color);
+        }
+        
+        .compact-tags {
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+        
+        .compact-tag {
+            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-color);
+            border-radius: 3px;
+        }
+        
+        .right-panel {
+            background: var(--bg-secondary);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .right-panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-primary);
+        }
+        
+        .detail-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        
+        .detail-url {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            word-break: break-all;
+        }
+        
+        .detail-url a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        
+        .detail-url a:hover {
+            text-decoration: underline;
+        }
+        
+        .detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-description {
+            font-size: 0.875rem;
+            opacity: 0.7;
+        }
+        
         .page-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -710,6 +901,62 @@
             animation: spin 1s linear infinite;
         }
         
+        /* Settings Panel */
+        .settings-panel {
+            display: none;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .settings-panel.active {
+            display: block;
+        }
+        
+        .settings-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .settings-toggle:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-color);
+        }
+        
+        .settings-toggle.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--accent-color);
+        }
+        
+        .main-input-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .url-input-container {
+            flex: 1;
+            min-width: 0; /* Allows flex item to shrink below content size */
+        }
+        
+        .crawl-button {
+            flex: 0 0 auto;
+            width: 120px; /* Fixed width for button */
+        }
+        
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -735,6 +982,23 @@
             .navbar {
                 padding: 1rem;
             }
+            
+            /* Split panel responsive design */
+            .split-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                min-height: 80vh;
+            }
+            
+            .left-panel {
+                max-height: 30vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .right-panel {
+                min-height: 50vh;
+            }
         }
     </style>
 </head>
@@ -755,196 +1019,203 @@
             <p>Extract structured content from any website with advanced real-time crawling technology</p>
         </div>
 
-        <!-- Main Form Card -->
+        <!-- Simplified Input Area -->
         <div class="main-card">
             <form id="crawlForm" onsubmit="return false;">
-                <div class="form-group">
-                    <label for="url" class="form-label">Target URL</label>
-                    <input type="url" id="url" name="url" class="form-input" placeholder="https://example.com" required>
+                <div class="main-input-row">
+                    <button type="button" class="settings-toggle" id="settingsToggle" onclick="toggleSettings()" title="Configure crawl settings">
+                        ⚙️
+                    </button>
+                    <div class="url-input-container">
+                        <label for="url" class="form-label">Target URL</label>
+                        <input type="url" id="url" name="url" class="form-input" placeholder="https://example.com" required>
+                    </div>
+                    <button type="button" id="crawlBtn" class="btn btn-primary crawl-button" onclick="startCrawl()" style="margin-top: 1.75rem;">
+                        <span id="btnText">Start</span>
+                    </button>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Crawl Limits (Optional)</label>
-                    <div class="ai-config-grid" style="grid-template-columns: 1fr 1fr;">
-                        <div class="ai-config-item">
-                            <label for="maxPages" class="form-label">Max Pages</label>
-                            <input type="number" id="maxPages" class="form-input" placeholder="e.g., 50 (empty = unlimited)" min="1">
+                <!-- Advanced Settings Panel (Hidden by Default) -->
+                <div id="settingsPanel" class="settings-panel">
+                    <div class="form-group">
+                        <label class="form-label">Crawl Limits (Optional)</label>
+                        <div class="ai-config-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="ai-config-item">
+                                <label for="maxPages" class="form-label">Max Pages</label>
+                                <input type="number" id="maxPages" class="form-input" placeholder="e.g., 50 (empty = unlimited)" min="1">
+                            </div>
+                            
+                            <div class="ai-config-item">
+                                <label for="maxDepth" class="form-label">Max Depth Level</label>
+                                <input type="number" id="maxDepth" class="form-input" placeholder="e.g., 3 (empty = unlimited)" min="1">
+                            </div>
                         </div>
-                        
-                        <div class="ai-config-item">
-                            <label for="maxDepth" class="form-label">Max Depth Level</label>
-                            <input type="number" id="maxDepth" class="form-input" placeholder="e.g., 3 (empty = unlimited)" min="1">
+                        <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                            <strong>Max Pages:</strong> Stop crawling after reaching this number of pages<br>
+                            <strong>Max Depth:</strong> Limit how many levels deep to crawl from the starting URL<br>
+                            <em>Leave both empty to crawl the entire website</em>
                         </div>
                     </div>
-                    <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
-                        <strong>Max Pages:</strong> Stop crawling after reaching this number of pages<br>
-                        <strong>Max Depth:</strong> Limit how many levels deep to crawl from the starting URL<br>
-                        <em>Leave both empty to crawl the entire website</em>
+                    
+                    <div class="form-group">
+                        <label class="form-label">AI Processing Configuration</label>
+                        <div class="ai-config-grid">
+                            <div class="ai-config-item">
+                                <label for="aiProvider" class="form-label">AI Provider</label>
+                                <select id="aiProvider" class="form-input">
+                                    <option value="">No AI Processing</option>
+                                    <option value="openai">OpenAI (GPT)</option>
+                                    <option value="claude">Anthropic (Claude)</option>
+                                    <option value="gemini">Google (Gemini)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="ai-config-item">
+                                <label for="aiModel" class="form-label">Model</label>
+                                <input type="text" id="aiModel" class="form-input" placeholder="e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-2.5-flash-preview-05-20">
+                            </div>
+                            
+                            <div class="ai-config-item">
+                                <label for="aiApiKey" class="form-label">API Key</label>
+                                <input type="password" id="aiApiKey" class="form-input" placeholder="Enter your API key">
+                            </div>
+                            
+                            <div class="ai-config-item full-width">
+                                <label for="aiPrompt" class="form-label">AI Prompt</label>
+                                <textarea id="aiPrompt" class="form-input" rows="3" placeholder="Enter your prompt for AI analysis of each page (e.g., 'Analyze this webpage content and extract key insights about the company's products and services')"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Target Content Selector (Optional)</label>
+                        <div class="ai-config-grid">
+                            <div class="ai-config-item">
+                                <label for="targetType" class="form-label">Selector Type</label>
+                                <select id="targetType" class="form-input">
+                                    <option value="">Full Page (Default)</option>
+                                    <option value="id">By ID</option>
+                                    <option value="class">By Class</option>
+                                    <option value="tag">By Tag</option>
+                                    <option value="custom">Custom CSS Selector</option>
+                                </select>
+                            </div>
+                            
+                            <div class="ai-config-item">
+                                <label for="targetSelector" class="form-label">Selector Value</label>
+                                <input type="text" id="targetSelector" class="form-input" placeholder="e.g., main-content, article, .content">
+                            </div>
+                            
+                            <div class="ai-config-item">
+                                <label for="targetMode" class="form-label">Extraction Mode</label>
+                                <select id="targetMode" class="form-input">
+                                    <option value="content">Content Inside (Default)</option>
+                                    <option value="element">Full Element with Tag</option>
+                                </select>
+                            </div>
+                            
+                            <div class="ai-config-item full-width">
+                                <label for="targetDescription" class="form-label">Description (Optional)</label>
+                                <input type="text" id="targetDescription" class="form-input" placeholder="e.g., Main article content, Product details section">
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                            <strong>Examples:</strong><br>
+                            • ID: "main-content" → #main-content<br>
+                            • Class: "article-body" → .article-body<br>
+                            • Tag: "article" → article<br>
+                            • Custom: "div.content > p" → div.content > p<br><br>
+                            <strong>Extraction Modes:</strong><br>
+                            • <strong>Content Inside:</strong> Gets text/HTML inside the element (default)<br>
+                            • <strong>Full Element:</strong> Gets the complete element including the tag itself
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Content Extraction Options</label>
+                        <div class="options-grid">
+                            <div class="option-card" onclick="toggleOption('extractHead')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractHead" class="checkbox" checked>
+                                    <div>
+                                        <div class="option-label">Head Metadata</div>
+                                        <div class="option-description">Title, meta tags, SEO data</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('extractHTML')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractHTML" class="checkbox" checked>
+                                    <div>
+                                        <div class="option-label">Full HTML</div>
+                                        <div class="option-description">Complete HTML source code</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('extractText')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractText" class="checkbox" checked>
+                                    <div>
+                                        <div class="option-label">Structured Text</div>
+                                        <div class="option-description">Clean, formatted content</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('extractMarkdown')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractMarkdown" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Markdown</div>
+                                        <div class="option-description">HTML converted to Markdown</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('extractHeadings')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractHeadings" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Headings</div>
+                                        <div class="option-description">H1-H6 structure analysis</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('extractParagraphs')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractParagraphs" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Paragraphs</div>
+                                        <div class="option-description">Individual content blocks</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('extractLinks')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractLinks" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Links & CTAs</div>
+                                        <div class="option-description">Navigation and call-to-actions</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('extractImages')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="extractImages" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Images</div>
+                                        <div class="option-description">Media assets and metadata</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label">AI Processing Configuration</label>
-                    <div class="ai-config-grid">
-                        <div class="ai-config-item">
-                            <label for="aiProvider" class="form-label">AI Provider</label>
-                            <select id="aiProvider" class="form-input">
-                                <option value="">No AI Processing</option>
-                                <option value="openai">OpenAI (GPT)</option>
-                                <option value="claude">Anthropic (Claude)</option>
-                                <option value="gemini">Google (Gemini)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="ai-config-item">
-                            <label for="aiModel" class="form-label">Model</label>
-                            <input type="text" id="aiModel" class="form-input" placeholder="e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-2.5-flash-preview-05-20">
-                        </div>
-                        
-                        <div class="ai-config-item">
-                            <label for="aiApiKey" class="form-label">API Key</label>
-                            <input type="password" id="aiApiKey" class="form-input" placeholder="Enter your API key">
-                        </div>
-                        
-                        <div class="ai-config-item full-width">
-                            <label for="aiPrompt" class="form-label">AI Prompt</label>
-                            <textarea id="aiPrompt" class="form-input" rows="3" placeholder="Enter your prompt for AI analysis of each page (e.g., 'Analyze this webpage content and extract key insights about the company's products and services')"></textarea>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Target Content Selector (Optional)</label>
-                    <div class="ai-config-grid">
-                        <div class="ai-config-item">
-                            <label for="targetType" class="form-label">Selector Type</label>
-                            <select id="targetType" class="form-input">
-                                <option value="">Full Page (Default)</option>
-                                <option value="id">By ID</option>
-                                <option value="class">By Class</option>
-                                <option value="tag">By Tag</option>
-                                <option value="custom">Custom CSS Selector</option>
-                            </select>
-                        </div>
-                        
-                        <div class="ai-config-item">
-                            <label for="targetSelector" class="form-label">Selector Value</label>
-                            <input type="text" id="targetSelector" class="form-input" placeholder="e.g., main-content, article, .content">
-                        </div>
-                        
-                        <div class="ai-config-item">
-                            <label for="targetMode" class="form-label">Extraction Mode</label>
-                            <select id="targetMode" class="form-input">
-                                <option value="content">Content Inside (Default)</option>
-                                <option value="element">Full Element with Tag</option>
-                            </select>
-                        </div>
-                        
-                        <div class="ai-config-item full-width">
-                            <label for="targetDescription" class="form-label">Description (Optional)</label>
-                            <input type="text" id="targetDescription" class="form-input" placeholder="e.g., Main article content, Product details section">
-                        </div>
-                    </div>
-                    <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
-                        <strong>Examples:</strong><br>
-                        • ID: "main-content" → #main-content<br>
-                        • Class: "article-body" → .article-body<br>
-                        • Tag: "article" → article<br>
-                        • Custom: "div.content > p" → div.content > p<br><br>
-                        <strong>Extraction Modes:</strong><br>
-                        • <strong>Content Inside:</strong> Gets text/HTML inside the element (default)<br>
-                        • <strong>Full Element:</strong> Gets the complete element including the tag itself
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Content Extraction Options</label>
-                    <div class="options-grid">
-                        <div class="option-card" onclick="toggleOption('extractHead')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractHead" class="checkbox" checked>
-                                <div>
-                                    <div class="option-label">Head Metadata</div>
-                                    <div class="option-description">Title, meta tags, SEO data</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="option-card" onclick="toggleOption('extractHTML')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractHTML" class="checkbox" checked>
-                                <div>
-                                    <div class="option-label">Full HTML</div>
-                                    <div class="option-description">Complete HTML source code</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="option-card" onclick="toggleOption('extractText')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractText" class="checkbox" checked>
-                                <div>
-                                    <div class="option-label">Structured Text</div>
-                                    <div class="option-description">Clean, formatted content</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="option-card" onclick="toggleOption('extractMarkdown')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractMarkdown" class="checkbox">
-                                <div>
-                                    <div class="option-label">Markdown</div>
-                                    <div class="option-description">HTML converted to Markdown</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="option-card" onclick="toggleOption('extractHeadings')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractHeadings" class="checkbox">
-                                <div>
-                                    <div class="option-label">Headings</div>
-                                    <div class="option-description">H1-H6 structure analysis</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="option-card" onclick="toggleOption('extractParagraphs')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractParagraphs" class="checkbox">
-                                <div>
-                                    <div class="option-label">Paragraphs</div>
-                                    <div class="option-description">Individual content blocks</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="option-card" onclick="toggleOption('extractLinks')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractLinks" class="checkbox">
-                                <div>
-                                    <div class="option-label">Links & CTAs</div>
-                                    <div class="option-description">Navigation and call-to-actions</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="option-card" onclick="toggleOption('extractImages')">
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="extractImages" class="checkbox">
-                                <div>
-                                    <div class="option-label">Images</div>
-                                    <div class="option-description">Media assets and metadata</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="button" id="crawlBtn" class="btn btn-primary" onclick="startCrawl()">
-                    <span id="btnText">Start Intelligent Crawl</span>
-                </button>
             </form>
         </div>
 
@@ -955,37 +1226,82 @@
             <div id="crawlStatus" class="status-detail"></div>
         </div>
 
-        <!-- Results Container -->
-        <div id="results" class="results-container">
-            <div class="main-card">
-                <div class="section-header">
-                    <h2 class="section-title">Discovered URLs</h2>
-                    <span id="urlCount" class="count-badge">0 found</span>
-                </div>
-                <div id="urlList" class="urls-grid"></div>
-            </div>
-        </div>
-
-        <!-- Page Content -->
-        <div id="pageContent" class="results-container">
-            <div class="main-card">
-                <div class="section-header">
-                    <h2 class="section-title">Extracted Content</h2>
-                    <span id="pageCount" class="count-badge">0 pages</span>
-                </div>
-                <div id="pageList" class="page-grid"></div>
-            </div>
-        </div>
-
         <!-- Error Container -->
         <div id="error" class="error-container">
             <div class="error-text" id="errorText"></div>
         </div>
     </div>
 
+    <!-- Page Content - Split Panel (Full Width) -->
+    <div id="pageContent" class="results-container" style="padding: 0 2rem; margin-top: 2rem;">
+        <div class="section-header" style="margin-bottom: 1.5rem;">
+            <h2 class="section-title">Extracted Content</h2>
+            <span id="pageCount" class="count-badge">0 pages</span>
+        </div>
+        
+        <!-- Split Panel Container -->
+        <div id="splitContainer" class="split-container" style="width: 100%;">
+            <!-- Left Panel - Page Cards -->
+            <div class="left-panel">
+                <div class="left-panel-header">
+                    <div class="left-panel-title">Pages</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Click a page to view details</div>
+                </div>
+                <div id="pageCardsList" class="page-cards-container"></div>
+            </div>
+            
+            <!-- Right Panel - Page Details -->
+            <div class="right-panel">
+                <div id="detailHeader" class="right-panel-header" style="display: none;">
+                    <div id="detailTitle" class="detail-title"></div>
+                    <div id="detailUrl" class="detail-url"></div>
+                </div>
+                <div id="detailContent" class="detail-content">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <div class="empty-state-text">Select a page to view details</div>
+                        <div class="empty-state-description">Click on any page card to see its extracted content, AI analysis, and more</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fallback: Original page grid (hidden when split panel is active) -->
+        <div id="pageList" class="page-grid"></div>
+    </div>
+
+    <!-- Results Container (URLs - Compact) -->
+    <div id="results" class="results-container" style="padding: 0 2rem; margin-top: 1rem;">
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1rem;">
+            <div class="section-header" style="margin-bottom: 1rem;">
+                <h3 style="font-size: 1rem; margin: 0; color: var(--text-secondary);">Discovered URLs</h3>
+                <span id="urlCount" class="count-badge">0 found</span>
+            </div>
+            <div id="urlList" class="urls-grid" style="max-height: 200px;"></div>
+        </div>
+    </div>
+
     <script>
         let eventSource = null;
         let pageCounter = 0;
+        let pagesData = {}; // Store page data for split panel
+        let selectedPageUrl = null;
+        
+        // Toggle settings panel
+        function toggleSettings() {
+            const settingsPanel = document.getElementById('settingsPanel');
+            const settingsToggle = document.getElementById('settingsToggle');
+            
+            if (settingsPanel.classList.contains('active')) {
+                settingsPanel.classList.remove('active');
+                settingsToggle.classList.remove('active');
+                settingsToggle.textContent = '⚙️';
+            } else {
+                settingsPanel.classList.add('active');
+                settingsToggle.classList.add('active');
+                settingsToggle.textContent = '✕';
+            }
+        }
         
         // Toggle option card and checkbox
         function toggleOption(id) {
@@ -1043,6 +1359,90 @@
                 }
             });
         });
+        
+        // Create compact page card for left panel
+        function createCompactPageCard(page) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'page-card-compact';
+            cardDiv.onclick = () => selectPage(page.url);
+            
+            // Determine status and tags
+            const hasError = page.error;
+            const hasAI = page.ai_analysis && !page.ai_analysis.includes("Error:");
+            const contentTypes = [];
+            
+            if (page.head_data) contentTypes.push('HEAD');
+            if (page.content) contentTypes.push('TEXT');
+            if (page.markdown) contentTypes.push('MD');
+            if (page.headings && page.headings.length > 0) contentTypes.push('H1-6');
+            if (page.paragraphs && page.paragraphs.length > 0) contentTypes.push('PARA');
+            if (page.links && page.links.length > 0) contentTypes.push('LINKS');
+            if (page.images && page.images.length > 0) contentTypes.push('IMG');
+            if (page.html_content) contentTypes.push('HTML');
+            
+            const statusClass = hasError ? 'error' : hasAI ? 'ai' : '';
+            const title = page.title || 'Untitled Page';
+            
+            cardDiv.innerHTML = `
+                <div class="compact-title">${escapeHtml(title)}</div>
+                <div class="compact-url">${page.url}</div>
+                <div class="compact-status">
+                    <div class="status-indicator ${statusClass}"></div>
+                    <div class="compact-tags">
+                        ${contentTypes.slice(0, 4).map(type => `<span class="compact-tag">${type}</span>`).join('')}
+                        ${contentTypes.length > 4 ? `<span class="compact-tag">+${contentTypes.length - 4}</span>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            return cardDiv;
+        }
+        
+        // Select a page and show its details in the right panel
+        function selectPage(pageUrl) {
+            const page = pagesData[pageUrl];
+            if (!page) return;
+            
+            // Update selected state
+            selectedPageUrl = pageUrl;
+            document.querySelectorAll('.page-card-compact').forEach(card => {
+                card.classList.remove('selected');
+                if (card.querySelector('.compact-url').textContent === pageUrl) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // Show detail header
+            const detailHeader = document.getElementById('detailHeader');
+            const detailTitle = document.getElementById('detailTitle');
+            const detailUrl = document.getElementById('detailUrl');
+            const detailContent = document.getElementById('detailContent');
+            
+            detailHeader.style.display = 'block';
+            detailTitle.textContent = page.title || 'Untitled Page';
+            detailUrl.innerHTML = `<a href="${page.url}" target="_blank">${page.url}</a>`;
+            
+            // Generate detailed content (reuse existing createPageElement logic)
+            const fullPageElement = createPageElement(page);
+            const contentSections = fullPageElement.querySelector('.content-sections');
+            const extractMoreSection = fullPageElement.querySelector('.extract-more-section');
+            
+            if (page.error) {
+                detailContent.innerHTML = `
+                    <div class="error-text" style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px;">
+                        ${page.error}
+                    </div>
+                `;
+            } else {
+                detailContent.innerHTML = '';
+                if (extractMoreSection) {
+                    detailContent.appendChild(extractMoreSection.cloneNode(true));
+                }
+                if (contentSections) {
+                    detailContent.appendChild(contentSections.cloneNode(true));
+                }
+            }
+        }
         
         function createPageElement(page) {
             const pageDiv = document.createElement('div');
@@ -1663,6 +2063,26 @@
             pageList.innerHTML = '';
             pageCounter = 0;
             
+            // Reset split panel
+            pagesData = {};
+            selectedPageUrl = null;
+            const pageCardsList = document.getElementById('pageCardsList');
+            const splitContainer = document.getElementById('splitContainer');
+            const detailHeader = document.getElementById('detailHeader');
+            const detailContent = document.getElementById('detailContent');
+            
+            pageCardsList.innerHTML = '';
+            splitContainer.classList.remove('active');
+            detailHeader.style.display = 'none';
+            detailContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📄</div>
+                    <div class="empty-state-text">Select a page to view details</div>
+                    <div class="empty-state-description">Click on any page card to see its extracted content, AI analysis, and more</div>
+                </div>
+            `;
+            pageList.style.display = 'grid';
+            
             // Update button state
             crawlBtn.disabled = true;
             btnText.textContent = 'Crawling...';
@@ -1726,11 +2146,31 @@
                 crawlStatus.textContent = `Processing: ${page.title || page.url}`;
                 pageCount.textContent = `${pageCounter} pages`;
                 
+                // Store page data for split panel
+                pagesData[page.url] = page;
+                
+                // Create compact card for left panel
+                const compactCard = createCompactPageCard(page);
+                const pageCardsList = document.getElementById('pageCardsList');
+                pageCardsList.appendChild(compactCard);
+                
+                // Show split container if first page
+                if (pageCounter === 1) {
+                    const splitContainer = document.getElementById('splitContainer');
+                    const pageList = document.getElementById('pageList');
+                    splitContainer.classList.add('active');
+                    pageList.style.display = 'none';
+                    
+                    // Auto-select first page
+                    setTimeout(() => selectPage(page.url), 100);
+                }
+                
+                // Also create full page element for fallback
                 const pageDiv = createPageElement(page);
                 pageList.appendChild(pageDiv);
                 
-                // Smooth scroll to new content
-                pageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                // Smooth scroll to new compact card
+                compactCard.scrollIntoView({ behavior: 'smooth', block: 'end' });
             });
             
             eventSource.addEventListener('complete', function(e) {
@@ -1883,13 +2323,61 @@
             console.log('Content:', content);
             console.log('Extracted types:', extractedTypes);
             
-            // Find the page card
+            // Update the stored page data
+            if (pagesData[pageUrl]) {
+                extractedTypes.forEach(type => {
+                    switch(type) {
+                        case 'text':
+                            pagesData[pageUrl].content = content.content;
+                            break;
+                        case 'markdown':
+                            pagesData[pageUrl].markdown = content.markdown;
+                            break;
+                        case 'headings':
+                            pagesData[pageUrl].headings = content.headings;
+                            break;
+                        case 'paragraphs':
+                            pagesData[pageUrl].paragraphs = content.paragraphs;
+                            break;
+                        case 'links':
+                            pagesData[pageUrl].links = content.links;
+                            break;
+                        case 'images':
+                            pagesData[pageUrl].images = content.images;
+                            break;
+                        case 'html':
+                            pagesData[pageUrl].html_content = content.html_content;
+                            break;
+                        case 'head':
+                            pagesData[pageUrl].head_data = content.head_data;
+                            break;
+                    }
+                });
+                
+                // Update compact card tags
+                const compactCard = Array.from(document.querySelectorAll('.page-card-compact')).find(card => 
+                    card.querySelector('.compact-url').textContent === pageUrl
+                );
+                if (compactCard) {
+                    const updatedCard = createCompactPageCard(pagesData[pageUrl]);
+                    compactCard.innerHTML = updatedCard.innerHTML;
+                    compactCard.onclick = () => selectPage(pageUrl);
+                }
+                
+                // If this page is currently selected, refresh the detail view
+                if (selectedPageUrl === pageUrl) {
+                    selectPage(pageUrl);
+                }
+                
+                return; // Skip the legacy fallback code below
+            }
+            
+            // Legacy fallback for old page cards (if split panel is not active)
             const pageCards = document.querySelectorAll('.page-card');
             let targetPageCard = null;
             
             for (const card of pageCards) {
                 const urlLink = card.querySelector('.page-url a');
-                console.log('Checking card URL:', urlLink ? urlLink.href : 'No URL link found');
                 if (urlLink && urlLink.href === pageUrl) {
                     targetPageCard = card;
                     break;
