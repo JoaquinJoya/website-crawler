@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"strings"
 	"sync"
 	"time"
 
@@ -89,15 +88,9 @@ func (cc *CollyCrawler) DiscoverURLsWithColly(targetURL string, baseURL *url.URL
 	cc.baseURL = baseURL
 	cc.foundURLs = make(map[string]bool)
 
-	// Set allowed domains dynamically
+	// Set allowed domains to ONLY the exact domain being crawled
 	cc.collector.AllowedDomains = []string{baseURL.Host}
-	if strings.HasPrefix(baseURL.Host, "www.") {
-		// Also allow non-www version
-		cc.collector.AllowedDomains = append(cc.collector.AllowedDomains, baseURL.Host[4:])
-	} else {
-		// Also allow www version
-		cc.collector.AllowedDomains = append(cc.collector.AllowedDomains, "www."+baseURL.Host)
-	}
+	fmt.Printf("🔒 Colly restricted to domain: %s\n", baseURL.Host)
 
 	// Set up comprehensive URL discovery using all existing patterns
 	cc.setupURLDiscoveryCallbacks()
@@ -252,8 +245,8 @@ func (cc *CollyCrawler) setupURLDiscoveryCallbacks() {
 			cleanURL.RawQuery = ""
 			cleanURLString := cleanURL.String()
 
-			// Check if it's a page URL
-			if isPageURL(cleanURLString) {
+			// Check if it's a page URL and on the correct domain
+			if isPageURL(cleanURLString) && cc.isValidDomain(cleanURLString) {
 				cc.addFoundURL(cleanURLString, context)
 				fmt.Printf("🔗 Colly found URL via %s: %s\n", context, cleanURLString)
 			}
@@ -286,7 +279,7 @@ func (cc *CollyCrawler) setupMetaTagCallbacks() {
 			}
 
 			absoluteURL := e.Request.AbsoluteURL(content)
-			if absoluteURL != "" && isPageURL(absoluteURL) {
+			if absoluteURL != "" && isPageURL(absoluteURL) && cc.isValidDomain(absoluteURL) {
 				cc.addFoundURL(absoluteURL, "meta-tags")
 			}
 		})
@@ -308,7 +301,7 @@ func (cc *CollyCrawler) setupLanguageAlternateCallbacks() {
 			}
 
 			absoluteURL := e.Request.AbsoluteURL(href)
-			if absoluteURL != "" && isPageURL(absoluteURL) {
+			if absoluteURL != "" && isPageURL(absoluteURL) && cc.isValidDomain(absoluteURL) {
 				hreflang := e.Attr("hreflang")
 				context := "alternate-links"
 				if hreflang != "" {
@@ -319,6 +312,20 @@ func (cc *CollyCrawler) setupLanguageAlternateCallbacks() {
 			}
 		})
 	}
+}
+
+func (cc *CollyCrawler) isValidDomain(urlStr string) bool {
+	if cc.baseURL == nil {
+		return true // Fallback if baseURL is not set
+	}
+	
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return false
+	}
+	
+	// Only allow URLs from the exact same domain
+	return parsedURL.Host == cc.baseURL.Host
 }
 
 func (cc *CollyCrawler) addFoundURL(urlStr, context string) {
@@ -347,29 +354,41 @@ func (cc *CollyCrawler) enhanceWithAdvancedDiscovery(initialURLs []string, baseU
 
 	fmt.Printf("Colly initial discovery: %d URLs\n", len(urlSet))
 
-	// Apply existing advanced discovery methods
+	// Apply existing advanced discovery methods (with domain filtering)
 	
-	// Add XML sitemap URLs
+	// Add XML sitemap URLs (with domain filtering)
 	fmt.Printf("Checking for XML sitemaps...\n")
 	sitemapURLs := discoverSitemapURLs(baseURL, ctx)
 	for _, sitemapURL := range sitemapURLs {
-		urlSet[sitemapURL] = true
+		if cc.isValidDomain(sitemapURL) {
+			urlSet[sitemapURL] = true
+		} else {
+			fmt.Printf("🚫 Rejected sitemap URL from different domain: %s\n", sitemapURL)
+		}
 	}
 	fmt.Printf("Total URLs after XML sitemap discovery: %d\n", len(urlSet))
 
-	// Generate smart language URL patterns
+	// Generate smart language URL patterns (with domain filtering)
 	fmt.Printf("Generating smart language URL patterns...\n")
 	patternURLs := GenerateLanguageURLPatterns(urlSet, baseURL)
 	for _, patternURL := range patternURLs {
-		urlSet[patternURL] = true
+		if cc.isValidDomain(patternURL) {
+			urlSet[patternURL] = true
+		} else {
+			fmt.Printf("🚫 Rejected pattern URL from different domain: %s\n", patternURL)
+		}
 	}
 	fmt.Printf("Total URLs after smart language pattern generation: %d\n", len(urlSet))
 
-	// Recursively discover more pages in language folders
+	// Recursively discover more pages in language folders (with domain filtering)
 	fmt.Printf("Recursively discovering more pages in language folders...\n")
 	recursiveURLs := DiscoverRecursiveLanguagePages(urlSet, baseURL, ctx)
 	for _, recursiveURL := range recursiveURLs {
-		urlSet[recursiveURL] = true
+		if cc.isValidDomain(recursiveURL) {
+			urlSet[recursiveURL] = true
+		} else {
+			fmt.Printf("🚫 Rejected recursive URL from different domain: %s\n", recursiveURL)
+		}
 	}
 	fmt.Printf("Total URLs after recursive language discovery: %d\n", len(urlSet))
 

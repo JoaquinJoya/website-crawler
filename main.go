@@ -114,6 +114,8 @@ func (s *Server) SetupRoutes() {
 	s.router.GET("/", s.homeHandler)
 	s.router.POST("/crawl", s.crawlHandler)
 	s.router.GET("/stream-crawl", s.streamCrawlHandler)
+	s.router.POST("/retry-ai", s.retryAIHandler)
+	s.router.POST("/extract-additional", s.extractAdditionalHandler)
 	s.router.GET("/monitoring", s.monitoringHandler)
 	s.router.GET("/monitoring/stats", s.monitoringStatsHandler)
 	s.router.GET("/monitoring/language-sync", s.languageSyncHandler)
@@ -602,6 +604,149 @@ func calculateURLDepth(targetURL, baseURL *url.URL) int {
 	return len(strings.Split(remainingPath, "/"))
 }
 
+// AI retry handler
+func (s *Server) retryAIHandler(c *gin.Context) {
+	var request struct {
+		URL      string `json:"url" binding:"required"`
+		Prompt   string `json:"prompt" binding:"required"`
+		Provider string `json:"provider" binding:"required"`
+		Model    string `json:"model"`
+		APIKey   string `json:"api_key" binding:"required"`
+		// Add content extraction options to preserve user's original selection
+		Head       bool `json:"head"`
+		HTML       bool `json:"html"`
+		Text       bool `json:"text"`
+		Markdown   bool `json:"markdown"`
+		Headings   bool `json:"headings"`
+		Paragraphs bool `json:"paragraphs"`
+		Links      bool `json:"links"`
+		Images     bool `json:"images"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	cfg := config.Load()
+	
+	// Create colly config for page fetching
+	collyConfig := crawler.CollyConfig{
+		Enabled:            cfg.Colly.Enabled,
+		UserAgent:          cfg.Colly.UserAgent,
+		Delay:              cfg.Colly.Delay,
+		RandomDelay:        cfg.Colly.RandomDelay,
+		Parallelism:        cfg.Colly.Parallelism,
+		DomainGlob:         cfg.Colly.DomainGlob,
+		RespectRobotsTxt:   cfg.Colly.RespectRobotsTxt,
+		AllowURLRevisit:    cfg.Colly.AllowURLRevisit,
+		CacheDir:           cfg.Colly.CacheDir,
+		DebugMode:          cfg.Colly.DebugMode,
+		Async:              cfg.Colly.Async,
+		CacheEnabled:       cfg.Colly.CacheEnabled,
+		CacheTTL:           cfg.Colly.CacheTTL,
+	}
+
+	// Fetch the page content
+	fetcher := crawler.NewPageFetcherWithBackend(cfg.Colly.Enabled, collyConfig)
+	doc, err := fetcher.FetchDocument(request.URL, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch page content",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Extract page content for AI analysis using original content options
+	page := PageContent{
+		URL:   request.URL,
+		Title: extract.Title(doc),
+	}
+	
+	// Only extract content types that were originally selected
+	if request.Text {
+		page.Content = extract.FormattedText(doc)
+	}
+	
+	if request.HTML {
+		htmlContent, _ := doc.Html()
+		page.HTMLContent = htmlContent
+	}
+	
+	if request.Head {
+		page.HeadData = extract.HeadData(doc)
+	}
+	
+	if request.Markdown {
+		page.Markdown = extract.Markdown(doc)
+	}
+	
+	if request.Headings {
+		page.Headings = extract.Headings(doc)
+	}
+	
+	if request.Paragraphs {
+		page.Paragraphs = extract.Paragraphs(doc)
+	}
+	
+	if request.Links {
+		page.Links = extract.Links(doc, request.URL)
+	}
+	
+	if request.Images {
+		page.Images = extract.Images(doc, request.URL)
+	}
+
+	// Prepare AI configuration
+	aiConfig := AIConfig{
+		Provider: request.Provider,
+		Model:    request.Model,
+		APIKey:   request.APIKey,
+		Prompt:   request.Prompt,
+	}
+
+	// Process with AI
+	if aiConfig.Provider != "" && aiConfig.APIKey != "" && aiConfig.Prompt != "" {
+		content := ai.PrepareContentForAI(page.Title, page.URL, page.Content, page.Headings, page.Paragraphs, page.Links, page.Images)
+		fullPrompt := fmt.Sprintf("%s\n\nContent to analyze:\n%s", aiConfig.Prompt, content)
+		page.AIPrompt = fullPrompt
+		
+		provider := ai.NewPythonProvider(ai.Config{
+			Provider: aiConfig.Provider,
+			Model:    aiConfig.Model,
+			APIKey:   aiConfig.APIKey,
+			Prompt:   aiConfig.Prompt,
+		})
+		
+		if analysis, err := provider.Process(content, aiConfig.Prompt, ctx); err == nil {
+			page.AIAnalysis = analysis
+			c.JSON(http.StatusOK, gin.H{
+				"success": true,
+				"ai_analysis": analysis,
+				"ai_prompt": fullPrompt,
+			})
+		} else {
+			page.AIAnalysis = fmt.Sprintf("AI Processing Error: %v", err)
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"error": page.AIAnalysis,
+				"ai_prompt": fullPrompt,
+			})
+		}
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Missing required AI configuration",
+		})
+	}
+}
+
 // Monitoring handlers
 func (s *Server) monitoringHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "monitoring.html", gin.H{
@@ -716,5 +861,123 @@ func (s *Server) languageSyncHandler(c *gin.Context) {
 		"processed_pages":  processedCount,
 		"language_report":  report,
 		"timestamp":        time.Now(),
+	})
+}
+
+// Extract additional content handler
+func (s *Server) extractAdditionalHandler(c *gin.Context) {
+	var request struct {
+		URL              string `json:"url" binding:"required"`
+		ContentTypes     []string `json:"content_types" binding:"required"`
+		UseCache        bool   `json:"use_cache"`
+		TargetSelector  string `json:"target_selector"`
+		TargetType      string `json:"target_type"`
+		TargetMode      string `json:"target_mode"`
+		TargetDescription string `json:"target_description"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	cfg := config.Load()
+	
+	// Create colly config for page fetching
+	collyConfig := crawler.CollyConfig{
+		Enabled:            cfg.Colly.Enabled,
+		UserAgent:          cfg.Colly.UserAgent,
+		Delay:              cfg.Colly.Delay,
+		RandomDelay:        cfg.Colly.RandomDelay,
+		Parallelism:        cfg.Colly.Parallelism,
+		DomainGlob:         cfg.Colly.DomainGlob,
+		RespectRobotsTxt:   cfg.Colly.RespectRobotsTxt,
+		AllowURLRevisit:    cfg.Colly.AllowURLRevisit,
+		CacheDir:           cfg.Colly.CacheDir,
+		DebugMode:          cfg.Colly.DebugMode,
+		Async:              cfg.Colly.Async,
+		CacheEnabled:       cfg.Colly.CacheEnabled,
+		CacheTTL:           cfg.Colly.CacheTTL,
+	}
+
+	// Fetch the page content (will use cache if available and requested)
+	fetcher := crawler.NewPageFetcherWithBackend(cfg.Colly.Enabled, collyConfig)
+	doc, err := fetcher.FetchDocument(request.URL, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch page content",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	workingDoc := doc
+	
+	// Apply target selector if specified
+	if request.TargetType != "" && request.TargetSelector != "" {
+		var cssSelector string
+		switch request.TargetType {
+		case "id":
+			cssSelector = "#" + request.TargetSelector
+		case "class":
+			cssSelector = "." + request.TargetSelector
+		case "tag":
+			cssSelector = request.TargetSelector
+		case "custom":
+			cssSelector = request.TargetSelector
+		}
+		
+		if cssSelector != "" {
+			if targetDoc, err := fetcher.ApplyTargetSelector(doc, &crawler.TargetSelector{
+				Selector:    cssSelector,
+				Type:        request.TargetType,
+				Description: request.TargetDescription,
+				Mode:        request.TargetMode,
+			}); err == nil && targetDoc != nil {
+				workingDoc = targetDoc
+			}
+		}
+	}
+
+	// Initialize response with basic page info
+	result := PageContent{
+		URL:   request.URL,
+		Title: extract.Title(doc),
+	}
+
+	// Extract only the requested content types
+	for _, contentType := range request.ContentTypes {
+		switch contentType {
+		case "text":
+			result.Content = extract.FormattedText(workingDoc)
+		case "html":
+			htmlContent, _ := workingDoc.Html()
+			result.HTMLContent = htmlContent
+		case "head":
+			result.HeadData = extract.HeadData(doc)
+		case "markdown":
+			result.Markdown = extract.Markdown(workingDoc)
+		case "headings":
+			result.Headings = extract.Headings(workingDoc)
+		case "paragraphs":
+			result.Paragraphs = extract.Paragraphs(workingDoc)
+		case "links":
+			result.Links = extract.Links(workingDoc, request.URL)
+		case "images":
+			result.Images = extract.Images(workingDoc, request.URL)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"content": result,
+		"extracted_types": request.ContentTypes,
+		"from_cache": request.UseCache,
 	})
 }

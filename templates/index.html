@@ -518,6 +518,198 @@
             color: var(--success-color);
         }
         
+        .ai-section.error-state {
+            border-left: 4px solid var(--error-color) !important;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .ai-section.error-state .content-title {
+            color: var(--error-color);
+        }
+        
+        .ai-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .extract-more-section {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .extract-more-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .extract-more-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .extract-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .extract-option {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .extract-option:hover {
+            border-color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .extract-option.selected {
+            border-color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-color);
+        }
+        
+        .extract-option input[type="checkbox"] {
+            width: 0.75rem;
+            height: 0.75rem;
+            accent-color: var(--accent-color);
+        }
+        
+        .extract-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .btn-extract {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border: none;
+            min-width: 100px;
+        }
+        
+        .btn-extract:hover:not(:disabled) {
+            background: var(--accent-hover);
+        }
+        
+        .btn-extract:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .extract-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .extract-spinner {
+            width: 0.875rem;
+            height: 0.875rem;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .btn-retry {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border: none;
+        }
+        
+        .btn-retry:hover {
+            background: var(--accent-hover);
+        }
+        
+        .btn-edit {
+            background: var(--warning-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border: none;
+        }
+        
+        .btn-edit:hover {
+            background: #d97706;
+        }
+        
+        .btn-retry:disabled, .btn-edit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .prompt-editor {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 2px);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                max-height: 200px;
+            }
+        }
+        
+        .prompt-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .editor-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .retry-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .retry-spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -1010,20 +1202,48 @@
                 if (page.ai_analysis) {
                     const aiId = 'ai-' + Date.now() + Math.random().toString(36).substr(2, 9);
                     const promptId = 'prompt-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    const editId = 'edit-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                    const hasError = page.ai_analysis.includes("Error:");
+                    const sectionClass = hasError ? 'ai-section error-state' : 'ai-section';
+                    const titleText = hasError ? '🤖 AI Analysis Failed' : '🤖 AI Analysis';
+                    
                     const promptDisplay = page.ai_prompt ? `<div style="margin-bottom: 1rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid var(--accent-color);"><strong>Prompt Used:</strong><br><em>${escapeHtml(page.ai_prompt)}</em></div>` : '';
-                    sectionsHtml += `<div class="content-section ai-section">
+                    
+                    sectionsHtml += `<div class="content-section ${sectionClass}" id="ai-section-${page.url.replace(/[^a-zA-Z0-9]/g, '-')}">
                         <div class="content-header">
-                            <div class="content-title">🤖 AI Analysis</div>
-                            <div>
-                                ${page.ai_prompt ? `<button class="btn btn-secondary" onclick="toggleContent('${promptId}')" style="margin-right: 0.5rem;">View Full Prompt</button>` : ''}
-                                <button class="btn btn-secondary" onclick="toggleContent('${aiId}')">View Analysis</button>
+                            <div class="content-title">${titleText}</div>
+                            <div class="ai-controls">
+                                <button class="btn btn-retry" onclick="retryAIAnalysis('${page.url}', '${editId}')" title="Retry with same prompt">🔄 Retry</button>
+                                <button class="btn btn-edit" onclick="editAndRetryAI('${page.url}', '${editId}')" title="Edit prompt and retry">✏️ Edit Prompt</button>
+                                ${!hasError && page.ai_prompt ? `<button class="btn btn-secondary" onclick="toggleContent('${promptId}')" style="margin-right: 0.5rem;">View Full Prompt</button>` : ''}
+                                ${!hasError ? `<button class="btn btn-secondary" onclick="toggleContent('${aiId}')">View Analysis</button>` : ''}
                             </div>
                         </div>
-                        <div class="content-preview">
-                            <div class="content-text">${formatMarkdownPreview(page.ai_analysis.substring(0, 150))}...</div>
+                        
+                        <!-- Prompt Editor (hidden by default) -->
+                        <div id="${editId}" class="prompt-editor" style="display: none;">
+                            <label class="form-label">Edit Prompt:</label>
+                            <textarea class="form-input prompt-textarea" rows="4" placeholder="Enter your AI analysis prompt...">${escapeHtml(extractOriginalPrompt(page.ai_prompt))}</textarea>
+                            <div class="editor-actions" style="margin-top: 0.75rem;">
+                                <button class="btn btn-primary" onclick="executeRetryWithNewPrompt('${page.url}', '${editId}')">🚀 Retry with New Prompt</button>
+                                <button class="btn btn-secondary" onclick="cancelPromptEdit('${editId}')">Cancel</button>
+                            </div>
                         </div>
-                        ${page.ai_prompt ? `<div id="${promptId}" class="content-full" style="display: none;"><div style="padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid var(--accent-color);"><strong>Complete Prompt Sent to AI (including crawled data):</strong><br><pre style="white-space: pre-wrap; margin: 0.5rem 0; font-family: inherit; font-size: 0.85rem;">${escapeHtml(page.ai_prompt)}</pre></div></div>` : ''}
-                        <div id="${aiId}" class="content-full">${promptDisplay}${formatMarkdownPreview(page.ai_analysis)}</div>
+                        
+                        ${hasError ? `
+                            <div class="error-message" style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; margin-top: 0.75rem;">
+                                <div class="error-text" style="color: var(--error-color); font-weight: 500;">${page.ai_analysis}</div>
+                                <div class="error-suggestion" style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem;">
+                                    💡 Try: Check API key, reduce content length, or modify your prompt
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="content-preview">
+                                <div class="content-text">${formatMarkdownPreview(page.ai_analysis.substring(0, 150))}...</div>
+                            </div>
+                            ${page.ai_prompt ? `<div id="${promptId}" class="content-full" style="display: none;"><div style="padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid var(--accent-color);"><strong>Complete Prompt Sent to AI (including crawled data):</strong><br><pre style="white-space: pre-wrap; margin: 0.5rem 0; font-family: inherit; font-size: 0.85rem;">${escapeHtml(page.ai_prompt)}</pre></div></div>` : ''}
+                            <div id="${aiId}" class="content-full">${promptDisplay}${formatMarkdownPreview(page.ai_analysis)}</div>
+                        `}
                     </div>`;
                 }
                 
@@ -1042,11 +1262,61 @@
                     </div>`;
                 }
                 
+                const extractMoreId = 'extract-' + Date.now() + Math.random().toString(36).substr(2, 9);
+                
                 pageDiv.innerHTML = `
                     <div class="page-header">
                         <div class="page-title">${page.title}</div>
                         <div class="page-url"><a href="${page.url}" target="_blank">${page.url}</a></div>
                     </div>
+                    
+                    <!-- Extract More Section -->
+                    <div class="extract-more-section">
+                        <div class="extract-more-header">
+                            <div class="extract-more-title">➕ Extract Additional Content</div>
+                        </div>
+                        <div class="extract-options" id="${extractMoreId}">
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'text')">
+                                <input type="checkbox" id="${extractMoreId}-text" value="text">
+                                <label>Structured Text</label>
+                            </div>
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'markdown')">
+                                <input type="checkbox" id="${extractMoreId}-markdown" value="markdown">
+                                <label>Markdown</label>
+                            </div>
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'headings')">
+                                <input type="checkbox" id="${extractMoreId}-headings" value="headings">
+                                <label>Headings</label>
+                            </div>
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'paragraphs')">
+                                <input type="checkbox" id="${extractMoreId}-paragraphs" value="paragraphs">
+                                <label>Paragraphs</label>
+                            </div>
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'links')">
+                                <input type="checkbox" id="${extractMoreId}-links" value="links">
+                                <label>Links</label>
+                            </div>
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'images')">
+                                <input type="checkbox" id="${extractMoreId}-images" value="images">
+                                <label>Images</label>
+                            </div>
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'html')">
+                                <input type="checkbox" id="${extractMoreId}-html" value="html">
+                                <label>Full HTML</label>
+                            </div>
+                            <div class="extract-option" onclick="toggleExtractOption('${extractMoreId}', 'head')">
+                                <input type="checkbox" id="${extractMoreId}-head" value="head">
+                                <label>Head Metadata</label>
+                            </div>
+                        </div>
+                        <div class="extract-actions">
+                            <button class="btn btn-extract" onclick="extractAdditionalContent('${page.url}', '${extractMoreId}')" id="${extractMoreId}-btn">
+                                <span id="${extractMoreId}-btn-text">Extract Selected</span>
+                            </button>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Select content types to extract for this page</span>
+                        </div>
+                    </div>
+                    
                     <div class="content-sections">
                         ${sectionsHtml}
                     </div>
@@ -1094,6 +1364,239 @@
                 .replace(/\\n\\n/g, '</p><p>')
                 .replace(/^(?!<[h1-6]|<blockquote|<li|<pre)(.+)$/gim, '<p>$1</p>')
                 .replace(/\\n/g, '<br>');
+        }
+        
+        // AI Retry State Management
+        let retryState = {};
+        
+        // Extract original prompt from the full prompt (remove "Content to analyze:" part)
+        function extractOriginalPrompt(fullPrompt) {
+            if (!fullPrompt) return '';
+            const parts = fullPrompt.split('\n\nContent to analyze:\n');
+            return parts[0] || fullPrompt;
+        }
+        
+        // Get current AI configuration from form
+        function getCurrentAIConfig() {
+            return {
+                provider: document.getElementById('aiProvider').value,
+                model: document.getElementById('aiModel').value,
+                apiKey: document.getElementById('aiApiKey').value,
+                originalPrompt: document.getElementById('aiPrompt').value
+            };
+        }
+        
+        // Get current content extraction options from form
+        function getCurrentContentOptions() {
+            return {
+                head: document.getElementById('extractHead').checked,
+                html: document.getElementById('extractHTML').checked,
+                text: document.getElementById('extractText').checked,
+                markdown: document.getElementById('extractMarkdown').checked,
+                headings: document.getElementById('extractHeadings').checked,
+                paragraphs: document.getElementById('extractParagraphs').checked,
+                links: document.getElementById('extractLinks').checked,
+                images: document.getElementById('extractImages').checked
+            };
+        }
+        
+        // Retry AI analysis with the same prompt
+        function retryAIAnalysis(pageUrl, editId) {
+            const config = getCurrentAIConfig();
+            if (!config.provider || !config.apiKey || !config.originalPrompt) {
+                alert('Please ensure AI provider, API key, and prompt are configured in the main form.');
+                return;
+            }
+            
+            executeAIRetry(pageUrl, config.originalPrompt, editId);
+        }
+        
+        // Show prompt editor for editing
+        function editAndRetryAI(pageUrl, editId) {
+            const config = getCurrentAIConfig();
+            if (!config.provider || !config.apiKey) {
+                alert('Please ensure AI provider and API key are configured in the main form.');
+                return;
+            }
+            
+            const editor = document.getElementById(editId);
+            const textarea = editor.querySelector('.prompt-textarea');
+            
+            // Pre-fill with current prompt if available
+            if (!textarea.value && config.originalPrompt) {
+                textarea.value = config.originalPrompt;
+            }
+            
+            // Show editor
+            editor.style.display = 'block';
+            textarea.focus();
+        }
+        
+        // Execute retry with new prompt from editor
+        function executeRetryWithNewPrompt(pageUrl, editId) {
+            const editor = document.getElementById(editId);
+            const textarea = editor.querySelector('.prompt-textarea');
+            const newPrompt = textarea.value.trim();
+            
+            // Basic validation
+            if (!newPrompt) {
+                alert('Please enter a prompt.');
+                textarea.focus();
+                return;
+            }
+            
+            if (newPrompt.length < 10) {
+                alert('Please enter a more detailed prompt (at least 10 characters).');
+                textarea.focus();
+                return;
+            }
+            
+            if (newPrompt.length > 2000) {
+                alert('Prompt is too long. Please keep it under 2000 characters.');
+                textarea.focus();
+                return;
+            }
+            
+            // Hide editor
+            editor.style.display = 'none';
+            
+            executeAIRetry(pageUrl, newPrompt, editId);
+        }
+        
+        // Cancel prompt editing
+        function cancelPromptEdit(editId) {
+            const editor = document.getElementById(editId);
+            editor.style.display = 'none';
+        }
+        
+        // Execute AI retry request
+        function executeAIRetry(pageUrl, prompt, editId) {
+            const config = getCurrentAIConfig();
+            const contentOptions = getCurrentContentOptions();
+            const sectionId = 'ai-section-' + pageUrl.replace(/[^a-zA-Z0-9]/g, '-');
+            const section = document.getElementById(sectionId);
+            
+            if (!section) {
+                console.error('Could not find AI section for URL:', pageUrl);
+                return;
+            }
+            
+            // Update UI to show loading state
+            const retryBtn = section.querySelector('.btn-retry');
+            const editBtn = section.querySelector('.btn-edit');
+            const originalRetryText = retryBtn.innerHTML;
+            const originalEditText = editBtn.innerHTML;
+            
+            retryBtn.disabled = true;
+            editBtn.disabled = true;
+            retryBtn.innerHTML = '<span class="retry-loading">🔄 <span class="retry-spinner"></span> Retrying...</span>';
+            
+            // Prepare request data with content extraction options
+            const requestData = {
+                url: pageUrl,
+                prompt: prompt,
+                provider: config.provider,
+                model: config.model,
+                api_key: config.apiKey,
+                // Include content extraction options to preserve user's original selection
+                head: contentOptions.head,
+                html: contentOptions.html,
+                text: contentOptions.text,
+                markdown: contentOptions.markdown,
+                headings: contentOptions.headings,
+                paragraphs: contentOptions.paragraphs,
+                links: contentOptions.links,
+                images: contentOptions.images
+            };
+            
+            // Make API call
+            fetch('/retry-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update section with new analysis
+                    updateAISection(section, data.ai_analysis, data.ai_prompt, false);
+                } else {
+                    // Update section with error
+                    updateAISection(section, data.error, data.ai_prompt, true);
+                }
+            })
+            .catch(error => {
+                console.error('Retry request failed:', error);
+                updateAISection(section, 'Network error: Could not retry AI analysis. Please check your connection and try again.', prompt, true);
+            })
+            .finally(() => {
+                // Restore button states
+                retryBtn.disabled = false;
+                editBtn.disabled = false;
+                retryBtn.innerHTML = originalRetryText;
+            });
+        }
+        
+        // Update AI section with new content
+        function updateAISection(section, analysis, fullPrompt, hasError) {
+            const aiId = 'ai-updated-' + Date.now() + Math.random().toString(36).substr(2, 9);
+            const promptId = 'prompt-updated-' + Date.now() + Math.random().toString(36).substr(2, 9);
+            const editId = 'edit-updated-' + Date.now() + Math.random().toString(36).substr(2, 9);
+            
+            const pageUrl = section.id.replace('ai-section-', '').replace(/-/g, '/');
+            const sectionClass = hasError ? 'ai-section error-state' : 'ai-section';
+            const titleText = hasError ? '🤖 AI Analysis Failed' : '🤖 AI Analysis';
+            
+            const promptDisplay = fullPrompt ? `<div style="margin-bottom: 1rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid var(--accent-color);"><strong>Prompt Used:</strong><br><em>${escapeHtml(fullPrompt.split('\\n\\nContent to analyze:\\n')[0])}</em></div>` : '';
+            
+            section.className = `content-section ${sectionClass}`;
+            section.innerHTML = `
+                <div class="content-header">
+                    <div class="content-title">${titleText}</div>
+                    <div class="ai-controls">
+                        <button class="btn btn-retry" onclick="retryAIAnalysis('${pageUrl}', '${editId}')" title="Retry with same prompt">🔄 Retry</button>
+                        <button class="btn btn-edit" onclick="editAndRetryAI('${pageUrl}', '${editId}')" title="Edit prompt and retry">✏️ Edit Prompt</button>
+                        ${!hasError && fullPrompt ? `<button class="btn btn-secondary" onclick="toggleContent('${promptId}')" style="margin-right: 0.5rem;">View Full Prompt</button>` : ''}
+                        ${!hasError ? `<button class="btn btn-secondary" onclick="toggleContent('${aiId}')">View Analysis</button>` : ''}
+                    </div>
+                </div>
+                
+                <!-- Prompt Editor (hidden by default) -->
+                <div id="${editId}" class="prompt-editor" style="display: none;">
+                    <label class="form-label">Edit Prompt:</label>
+                    <textarea class="form-input prompt-textarea" rows="4" placeholder="Enter your AI analysis prompt...">${escapeHtml(extractOriginalPrompt(fullPrompt))}</textarea>
+                    <div class="editor-actions" style="margin-top: 0.75rem;">
+                        <button class="btn btn-primary" onclick="executeRetryWithNewPrompt('${pageUrl}', '${editId}')">🚀 Retry with New Prompt</button>
+                        <button class="btn btn-secondary" onclick="cancelPromptEdit('${editId}')">Cancel</button>
+                    </div>
+                </div>
+                
+                ${hasError ? `
+                    <div class="error-message" style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; margin-top: 0.75rem;">
+                        <div class="error-text" style="color: var(--error-color); font-weight: 500;">${analysis}</div>
+                        <div class="error-suggestion" style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem;">
+                            💡 Try: Check API key, reduce content length, or modify your prompt
+                        </div>
+                    </div>
+                ` : `
+                    <div class="content-preview">
+                        <div class="content-text">${formatMarkdownPreview(analysis.substring(0, 150))}...</div>
+                    </div>
+                    ${fullPrompt ? `<div id="${promptId}" class="content-full" style="display: none;"><div style="padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid var(--accent-color);"><strong>Complete Prompt Sent to AI (including crawled data):</strong><br><pre style="white-space: pre-wrap; margin: 0.5rem 0; font-family: inherit; font-size: 0.85rem;">${escapeHtml(fullPrompt)}</pre></div></div>` : ''}
+                    <div id="${aiId}" class="content-full">${promptDisplay}${formatMarkdownPreview(analysis)}</div>
+                `}
+            `;
+            
+            // Add success animation
+            if (!hasError) {
+                section.style.transform = 'scale(1.02)';
+                section.style.transition = 'transform 0.3s ease';
+                setTimeout(() => {
+                    section.style.transform = 'scale(1)';
+                }, 300);
+            }
         }
         
         function startCrawl() {
@@ -1271,6 +1774,236 @@
                 eventSource.close();
             }
         });
+        
+        // Per-page content extraction functions
+        function toggleExtractOption(extractId, contentType) {
+            const checkbox = document.getElementById(`${extractId}-${contentType}`);
+            const option = checkbox.closest('.extract-option');
+            
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                option.classList.add('selected');
+            } else {
+                option.classList.remove('selected');
+            }
+        }
+        
+        function extractAdditionalContent(pageUrl, extractId) {
+            const container = document.getElementById(extractId);
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+            const selectedTypes = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (selectedTypes.length === 0) {
+                alert('Please select at least one content type to extract.');
+                return;
+            }
+            
+            const button = document.getElementById(`${extractId}-btn`);
+            const buttonText = document.getElementById(`${extractId}-btn-text`);
+            const originalText = buttonText.textContent;
+            
+            // Update button state
+            button.disabled = true;
+            buttonText.innerHTML = '<span class="extract-loading">⚡ <span class="extract-spinner"></span> Extracting...</span>';
+            
+            // Get current target selector if specified in main form
+            const targetConfig = {
+                type: document.getElementById('targetType').value,
+                selector: document.getElementById('targetSelector').value,
+                mode: document.getElementById('targetMode').value,
+                description: document.getElementById('targetDescription').value
+            };
+            
+            // Prepare request data
+            const requestData = {
+                url: pageUrl,
+                content_types: selectedTypes,
+                use_cache: true,
+                target_selector: targetConfig.selector,
+                target_type: targetConfig.type,
+                target_mode: targetConfig.mode,
+                target_description: targetConfig.description
+            };
+            
+            console.log('Making request to /extract-additional with data:', requestData);
+            
+            // Make API call
+            fetch('/extract-additional', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Add new content sections to the page
+                    addExtractedContentToPage(pageUrl, data.content, data.extracted_types);
+                    
+                    // Clear selections
+                    checkboxes.forEach(cb => {
+                        cb.checked = false;
+                        cb.closest('.extract-option').classList.remove('selected');
+                    });
+                    
+                    // Show success message
+                    buttonText.innerHTML = '✅ Extracted!';
+                    setTimeout(() => {
+                        buttonText.textContent = originalText;
+                    }, 2000);
+                    
+                } else {
+                    alert('Failed to extract content: ' + (data.error || 'Unknown error'));
+                    buttonText.textContent = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Extract request failed:', error);
+                console.error('Error details:', error.message);
+                console.error('Request data was:', requestData);
+                alert(`Network error: ${error.message}\n\nPlease check the browser console for more details.`);
+                buttonText.textContent = originalText;
+            })
+            .finally(() => {
+                button.disabled = false;
+            });
+        }
+        
+        function addExtractedContentToPage(pageUrl, content, extractedTypes) {
+            console.log('Adding extracted content for URL:', pageUrl);
+            console.log('Content:', content);
+            console.log('Extracted types:', extractedTypes);
+            
+            // Find the page card
+            const pageCards = document.querySelectorAll('.page-card');
+            let targetPageCard = null;
+            
+            for (const card of pageCards) {
+                const urlLink = card.querySelector('.page-url a');
+                console.log('Checking card URL:', urlLink ? urlLink.href : 'No URL link found');
+                if (urlLink && urlLink.href === pageUrl) {
+                    targetPageCard = card;
+                    break;
+                }
+            }
+            
+            if (!targetPageCard) {
+                console.error('Could not find page card for URL:', pageUrl);
+                return;
+            }
+            
+            const contentSections = targetPageCard.querySelector('.content-sections');
+            if (!contentSections) {
+                console.error('Could not find content sections in page card');
+                return;
+            }
+            
+            // Add new content sections with animation
+            extractedTypes.forEach(contentType => {
+                const existingSection = contentSections.querySelector(`[data-content-type="${contentType}"]`);
+                if (existingSection) {
+                    // Update existing section
+                    existingSection.remove();
+                }
+                
+                const newSection = createContentSection(content, contentType);
+                if (newSection) {
+                    newSection.setAttribute('data-content-type', contentType);
+                    newSection.style.opacity = '0';
+                    newSection.style.transform = 'translateY(10px)';
+                    contentSections.appendChild(newSection);
+                    
+                    // Animate in
+                    setTimeout(() => {
+                        newSection.style.transition = 'all 0.3s ease';
+                        newSection.style.opacity = '1';
+                        newSection.style.transform = 'translateY(0)';
+                    }, 100);
+                }
+            });
+        }
+        
+        function createContentSection(content, contentType) {
+            const sectionId = `${contentType}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            
+            switch (contentType) {
+                case 'text':
+                    if (!content.content) return null;
+                    return createSectionElement('Structured Text', content.content, sectionId, 'text');
+                    
+                case 'markdown':
+                    if (!content.markdown) return null;
+                    return createSectionElement('Markdown', content.markdown, sectionId, 'code');
+                    
+                case 'headings':
+                    if (!content.headings || content.headings.length === 0) return null;
+                    const headingsContent = content.headings.map(h => `<div><strong>${h.level}:</strong> ${escapeHtml(h.text)}</div>`).join('<br>');
+                    return createSectionElement(`Headings`, headingsContent, sectionId, 'html', content.headings.length);
+                    
+                case 'paragraphs':
+                    if (!content.paragraphs || content.paragraphs.length === 0) return null;
+                    const paragraphsContent = content.paragraphs.map((p, i) => `<div class="paragraph-item"><strong>Paragraph ${i+1}:</strong><br>${escapeHtml(p)}</div>`).join('<br><br>');
+                    return createSectionElement(`Paragraphs`, paragraphsContent, sectionId, 'html', content.paragraphs.length);
+                    
+                case 'links':
+                    if (!content.links || content.links.length === 0) return null;
+                    const linksContent = content.links.map(l => `<div class="link-item"><strong>Text:</strong> ${escapeHtml(l.text)}<br><strong>URL:</strong> <a href="${l.url}" target="_blank">${l.url}</a>${l.title ? `<br><strong>Title:</strong> ${escapeHtml(l.title)}` : ''}</div>`).join('<br><br>');
+                    return createSectionElement(`Links`, linksContent, sectionId, 'html', content.links.length);
+                    
+                case 'images':
+                    if (!content.images || content.images.length === 0) return null;
+                    const imagesContent = content.images.map(img => `<div class="image-item"><strong>URL:</strong> <a href="${img.url}" target="_blank">${img.url}</a>${img.alt ? `<br><strong>Alt:</strong> ${escapeHtml(img.alt)}` : ''}${img.title ? `<br><strong>Title:</strong> ${escapeHtml(img.title)}` : ''}${img.width ? `<br><strong>Dimensions:</strong> ${img.width}x${img.height}` : ''}</div>`).join('<br><br>');
+                    return createSectionElement(`Images`, imagesContent, sectionId, 'html', content.images.length);
+                    
+                case 'html':
+                    if (!content.html_content) return null;
+                    return createSectionElement('Full HTML', content.html_content, sectionId, 'code');
+                    
+                case 'head':
+                    if (!content.head_data) return null;
+                    return createSectionElement('Head Metadata', JSON.stringify(content.head_data, null, 2), sectionId, 'code');
+                    
+                default:
+                    return null;
+            }
+        }
+        
+        function createSectionElement(title, content, sectionId, contentFormat, count) {
+            const section = document.createElement('div');
+            section.className = 'content-section';
+            
+            const previewContent = contentFormat === 'html' ? content.substring(0, 200) + '...' : 
+                                 contentFormat === 'code' ? `${content.substring(0, 100)}...` :
+                                 formatMarkdownPreview(content.substring(0, 200)) + '...';
+            
+            const countBadge = count ? `<span class="count-badge">${count}</span>` : '';
+            const fullContent = contentFormat === 'html' ? content : escapeHtml(content);
+            
+            section.innerHTML = `
+                <div class="content-header">
+                    <div class="content-title">🆕 ${title}</div>
+                    <div>
+                        ${countBadge}
+                        <button class="btn btn-secondary" onclick="toggleContent('${sectionId}')">View</button>
+                    </div>
+                </div>
+                <div class="content-preview">
+                    <div class="content-text">${previewContent}</div>
+                </div>
+                <div id="${sectionId}" class="content-full">${fullContent}</div>
+            `;
+            
+            return section;
+        }
     </script>
 </body>
 </html>
