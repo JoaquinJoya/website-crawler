@@ -1244,7 +1244,10 @@
             <!-- Left Panel - Page Cards -->
             <div class="left-panel">
                 <div class="left-panel-header">
-                    <div class="left-panel-title">Pages</div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <div class="left-panel-title">Pages</div>
+                        <span id="leftPanelCount" class="count-badge" style="display: none;">0</span>
+                    </div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">Click a page to view details</div>
                 </div>
                 <div id="pageCardsList" class="page-cards-container"></div>
@@ -2074,6 +2077,11 @@
             pageCardsList.innerHTML = '';
             splitContainer.classList.remove('active');
             detailHeader.style.display = 'none';
+            
+            // Reset page count badge
+            const leftPanelCount = document.getElementById('leftPanelCount');
+            leftPanelCount.style.display = 'none';
+            leftPanelCount.textContent = '0';
             detailContent.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">📄</div>
@@ -2153,6 +2161,11 @@
                 const compactCard = createCompactPageCard(page);
                 const pageCardsList = document.getElementById('pageCardsList');
                 pageCardsList.appendChild(compactCard);
+                
+                // Update left panel count badge
+                const leftPanelCount = document.getElementById('leftPanelCount');
+                leftPanelCount.textContent = pageCounter;
+                leftPanelCount.style.display = 'inline-block';
                 
                 // Show split container if first page
                 if (pageCounter === 1) {
