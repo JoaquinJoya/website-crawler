@@ -487,6 +487,245 @@
             border-radius: 3px;
         }
         
+        /* Page selection styles */
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-selector-checkbox {
+            margin-top: 0.125rem;
+            width: 1rem;
+            height: 1rem;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .card-main-content {
+            flex: 1;
+            cursor: pointer;
+        }
+        
+        .page-card-compact.comparison-selected {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 3px solid #22c55e;
+            padding-left: calc(1.5rem - 3px);
+        }
+        
+        /* Comparison control panel */
+        .comparison-control-panel {
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+        
+        .comparison-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-compare-all, .btn-compare-selected, .btn-clear-selection {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-compare-all {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-compare-all:hover {
+            background: var(--accent-hover);
+        }
+        
+        .btn-compare-selected {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .btn-compare-selected:hover {
+            background: #16a34a;
+        }
+        
+        .btn-clear-selection {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-clear-selection:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        /* Comparison Modal Styles */
+        .comparison-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .comparison-modal-content {
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .comparison-modal-content.large {
+            max-width: 900px;
+        }
+        
+        .comparison-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .comparison-modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .comparison-modal-body {
+            padding: 1.5rem;
+            space-y: 1.5rem;
+        }
+        
+        .prompt-section, .ai-config-section, .selected-pages-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .prompt-section h4, .ai-config-section h4, .selected-pages-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .prompt-templates {
+            margin-bottom: 0.75rem;
+        }
+        
+        .prompt-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .prompt-help {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .selected-pages-list {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .selected-page-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .selected-page-item:last-child {
+            border-bottom: none;
+        }
+        
+        .selected-page-info {
+            flex: 1;
+        }
+        
+        .selected-page-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .selected-page-url {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+        
+        .comparison-modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .comparison-results {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 1.5rem;
+            white-space: pre-wrap;
+            font-family: system-ui, sans-serif;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
         .right-panel {
             background: var(--bg-secondary);
             display: flex;
@@ -723,6 +962,364 @@
             align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
+        }
+        
+        /* QA Section Styles */
+        .qa-section {
+            border-left: 4px solid var(--accent-color) !important;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .qa-section .content-title {
+            color: var(--accent-color);
+        }
+        
+        .qa-check-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 2px);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .qa-check-item h5 {
+            margin: 0 0 0.75rem 0;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .qa-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .qa-stat {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 4px);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .qa-stat.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
+        }
+        
+        .qa-stat.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+        
+        .qa-stat.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--error-color);
+        }
+        
+        .qa-info {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: calc(var(--radius) - 4px);
+            font-size: 0.875rem;
+        }
+        
+        .qa-details {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: calc(var(--radius) - 4px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .qa-details h6 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .qa-issue {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: calc(var(--radius) - 4px);
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .qa-issue:last-child {
+            margin-bottom: 0;
+        }
+        
+        .qa-issue a {
+            color: var(--accent-color);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .qa-issue a:hover {
+            text-decoration: underline;
+        }
+        
+        .qa-warning {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        /* Site-wide QA Styles */
+        .site-wide-qa-container {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .site-wide-qa-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .site-wide-qa-header h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .site-wide-qa-header p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .qa-summary-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .qa-summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .qa-summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .qa-summary-header h4 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .qa-score {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .qa-score-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .qa-score-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .qa-score-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .qa-summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .qa-stat {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 2px);
+        }
+
+        .qa-stat-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .qa-stat-number.success {
+            color: var(--success-color);
+        }
+
+        .qa-stat-number.warning {
+            color: #f59e0b;
+        }
+
+        .qa-stat-number.error {
+            color: var(--error-color);
+        }
+
+        .qa-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .qa-broken-links-details {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: calc(var(--radius) - 2px);
+        }
+
+        .qa-broken-links-details h5 {
+            margin: 0 0 1rem 0;
+            color: var(--error-color);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .qa-broken-page {
+            margin-bottom: 1rem;
+        }
+
+        .qa-broken-page-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: calc(var(--radius) - 4px);
+        }
+
+        .qa-broken-links-list {
+            padding-left: 1rem;
+        }
+
+        .qa-broken-link {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: calc(var(--radius) - 4px);
+            border-left: 3px solid var(--error-color);
+        }
+
+        .qa-broken-link-url {
+            font-weight: 500;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .qa-broken-link-error {
+            font-size: 0.875rem;
+            color: var(--error-color);
+            margin-top: 0.25rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .qa-success {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: calc(var(--radius) - 4px);
+            color: var(--success-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .qa-summary-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: calc(var(--radius) - 2px);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .qa-summary-main {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .qa-summary-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .qa-detail-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: calc(var(--radius) - 4px);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .qa-detail-item.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .qa-detail-item.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        
+        .qa-detail-item.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
         
         .extract-more-section {
@@ -1215,6 +1812,51 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quality Assurance (QA) Checks</label>
+                        <div class="options-grid">
+                            <div class="option-card" onclick="toggleOption('qaValidateLinks')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="qaValidateLinks" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Link Validation</div>
+                                        <div class="option-description">Check for broken links and 404s</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('qaCheckImages')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="qaCheckImages" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Image Validation</div>
+                                        <div class="option-description">Verify image accessibility and loading</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('qaAccessibility')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="qaAccessibility" class="checkbox">
+                                    <div>
+                                        <div class="option-label">Accessibility Audit</div>
+                                        <div class="option-description">Alt tags, ARIA labels, semantic HTML</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="option-card" onclick="toggleOption('qaSEOBasics')">
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="qaSEOBasics" class="checkbox">
+                                    <div>
+                                        <div class="option-label">SEO Basics</div>
+                                        <div class="option-description">Meta tags, headings structure</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -1247,8 +1889,23 @@
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                         <div class="left-panel-title">Pages</div>
                         <span id="leftPanelCount" class="count-badge" style="display: none;">0</span>
+                        <button id="compareAllBtn" class="btn-compare-all" onclick="showComparisonModal('all')" 
+                                style="display: none; margin-left: auto;">
+                            Compare All
+                        </button>
                     </div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">Click a page to view details</div>
+                </div>
+                
+                <!-- Comparison Control Panel -->
+                <div id="comparisonPanel" class="comparison-control-panel" style="display: none;">
+                    <div class="comparison-header">
+                        <span id="selectedCount">0 pages selected</span>
+                        <div class="comparison-actions">
+                            <button class="btn-clear-selection" onclick="clearAllSelections()">Clear</button>
+                            <button class="btn-compare-selected" onclick="showComparisonModal('selected')">Compare Selected</button>
+                        </div>
+                    </div>
                 </div>
                 <div id="pageCardsList" class="page-cards-container"></div>
             </div>
@@ -1367,7 +2024,7 @@
         function createCompactPageCard(page) {
             const cardDiv = document.createElement('div');
             cardDiv.className = 'page-card-compact';
-            cardDiv.onclick = () => selectPage(page.url);
+            cardDiv.setAttribute('data-url', page.url);
             
             // Determine status and tags
             const hasError = page.error;
@@ -1382,13 +2039,53 @@
             if (page.links && page.links.length > 0) contentTypes.push('LINKS');
             if (page.images && page.images.length > 0) contentTypes.push('IMG');
             if (page.html_content) contentTypes.push('HTML');
+            if (page.qa_results) {
+                // Add QA status with more detail
+                const qr = page.qa_results;
+                let qaStatus = 'QA✅';
+                let qaDetails = [];
+                
+                if (qr.link_validation) {
+                    const lv = qr.link_validation;
+                    if (lv.broken_links > 0) {
+                        qaStatus = 'QA❌';
+                        qaDetails.push(`${lv.broken_links}/${lv.total_links} broken links`);
+                    } else {
+                        qaDetails.push(`${lv.total_links} links OK`);
+                    }
+                }
+                
+                if (qr.image_validation) {
+                    const iv = qr.image_validation;
+                    if (iv.broken_images > 0 || iv.missing_alt_text > 0) {
+                        qaStatus = 'QA❌';
+                    }
+                }
+                
+                if (qr.accessibility_audit && qr.accessibility_audit.accessibility_score < 80) {
+                    qaStatus = 'QA⚠️';
+                }
+                
+                if (qr.seo_basics && qr.seo_basics.seo_score < 80) {
+                    qaStatus = 'QA⚠️';
+                }
+                
+                contentTypes.push(qaStatus);
+            }
             
             const statusClass = hasError ? 'error' : hasAI ? 'ai' : '';
             const title = page.title || 'Untitled Page';
             
             cardDiv.innerHTML = `
-                <div class="compact-title">${escapeHtml(title)}</div>
-                <div class="compact-url">${page.url}</div>
+                <div class="card-header">
+                    <input type="checkbox" class="page-selector-checkbox" data-url="${page.url}" 
+                           onchange="togglePageSelection('${page.url}', this.checked)" 
+                           onclick="event.stopPropagation()">
+                    <div class="card-main-content" onclick="selectPage('${page.url}')">
+                        <div class="compact-title">${escapeHtml(title)}</div>
+                        <div class="compact-url">${page.url}</div>
+                    </div>
+                </div>
                 <div class="compact-status">
                     <div class="status-indicator ${statusClass}"></div>
                     <div class="compact-tags">
@@ -1650,6 +2347,11 @@
                     </div>`;
                 }
                 
+                // QA Results
+                if (page.qa_results) {
+                    sectionsHtml += createQAResultsSection(page.qa_results);
+                }
+                
                 // Full HTML
                 if (page.html_content) {
                     const htmlId = 'html-' + Date.now() + Math.random().toString(36).substr(2, 9);
@@ -1800,6 +2502,16 @@
                 paragraphs: document.getElementById('extractParagraphs').checked,
                 links: document.getElementById('extractLinks').checked,
                 images: document.getElementById('extractImages').checked
+            };
+        }
+
+        // Get current QA options from form
+        function getCurrentQAOptions() {
+            return {
+                validateLinks: document.getElementById('qaValidateLinks').checked,
+                checkImages: document.getElementById('qaCheckImages').checked,
+                accessibility: document.getElementById('qaAccessibility').checked,
+                seoBasics: document.getElementById('qaSEOBasics').checked
             };
         }
         
@@ -2016,6 +2728,9 @@
                 links: document.getElementById('extractLinks').checked,
                 images: document.getElementById('extractImages').checked
             };
+
+            // Get QA options
+            const qaOptions = getCurrentQAOptions();
             
             // Get AI configuration
             const aiConfig = {
@@ -2101,7 +2816,7 @@
             
             crawlStatus.textContent = 'Establishing connection...';
             
-            // Build query string with options, AI config, target selector, and crawl limits
+            // Build query string with options, AI config, target selector, crawl limits, and QA options
             const queryParams = new URLSearchParams({
                 url: url,
                 head: options.head,
@@ -2121,7 +2836,11 @@
                 target_mode: targetConfig.mode,
                 target_description: targetConfig.description,
                 max_pages: crawlLimits.maxPages,
-                max_depth: crawlLimits.maxDepth
+                max_depth: crawlLimits.maxDepth,
+                qa_validate_links: qaOptions.validateLinks,
+                qa_check_images: qaOptions.checkImages,
+                qa_accessibility: qaOptions.accessibility,
+                qa_seo_basics: qaOptions.seoBasics
             });
             
             // Start SSE connection
@@ -2184,6 +2903,14 @@
                 
                 // Smooth scroll to new compact card
                 compactCard.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            });
+            
+            eventSource.addEventListener('sitewide_qa', function(e) {
+                const siteWideQA = JSON.parse(e.data);
+                crawlStatus.textContent = '📊 Performing site-wide QA analysis...';
+                
+                // Create and display site-wide QA results
+                displaySiteWideQA(siteWideQA);
             });
             
             eventSource.addEventListener('complete', function(e) {
@@ -2505,6 +3232,796 @@
             
             return section;
         }
+
+        // Site-wide QA Results Display
+        function displaySiteWideQA(siteWideQA) {
+            console.log('Displaying site-wide QA results:', siteWideQA);
+            
+            // Find the appropriate container - prioritize main page content area
+            let targetContainer = document.getElementById('pageContent');
+            if (!targetContainer || targetContainer.style.display === 'none') {
+                targetContainer = document.getElementById('detailContent');
+            }
+            
+            // Remove any existing site-wide QA container
+            const existingQA = document.querySelector('.site-wide-qa-container');
+            if (existingQA) {
+                existingQA.remove();
+            }
+            
+            // Create site-wide QA summary section
+            const qaContainer = document.createElement('div');
+            qaContainer.className = 'site-wide-qa-container';
+            qaContainer.innerHTML = `
+                <div class="site-wide-qa-header">
+                    <h3>🔍 Site-wide QA Analysis</h3>
+                    <p>Comprehensive quality analysis across ${siteWideQA.total_pages_analyzed} pages</p>
+                </div>
+            `;
+            
+            // Link Validation Summary
+            if (siteWideQA.link_validation) {
+                const lv = siteWideQA.link_validation;
+                const linkStatusClass = lv.total_broken_links === 0 ? 'success' : lv.total_broken_links < 5 ? 'warning' : 'error';
+                const linkStatus = lv.total_broken_links === 0 ? '✅' : lv.total_broken_links < 5 ? '⚠️' : '❌';
+                
+                qaContainer.innerHTML += `
+                    <div class="qa-summary-card">
+                        <div class="qa-summary-header">
+                            <h4>${linkStatus} Link Validation</h4>
+                            <div class="qa-score qa-score-${linkStatusClass}">
+                                ${lv.total_valid_links}/${lv.total_links_found} working
+                            </div>
+                        </div>
+                        <div class="qa-summary-stats">
+                            <div class="qa-stat">
+                                <div class="qa-stat-number">${lv.total_links_found}</div>
+                                <div class="qa-stat-label">Total Links</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number success">${lv.total_valid_links}</div>
+                                <div class="qa-stat-label">Working</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number error">${lv.total_broken_links}</div>
+                                <div class="qa-stat-label">Broken</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number">${lv.total_internal_links}</div>
+                                <div class="qa-stat-label">Internal</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number">${lv.total_external_links}</div>
+                                <div class="qa-stat-label">External</div>
+                            </div>
+                        </div>
+                        ${lv.total_broken_links > 0 ? createBrokenLinksDetails(lv.broken_links_by_page) : ''}
+                    </div>
+                `;
+            }
+            
+            // Image Validation Summary
+            if (siteWideQA.image_validation) {
+                const iv = siteWideQA.image_validation;
+                const imageStatusClass = iv.total_broken_images === 0 && iv.total_missing_alt_text === 0 ? 'success' : 'warning';
+                const imageStatus = iv.total_broken_images === 0 && iv.total_missing_alt_text === 0 ? '✅' : '⚠️';
+                
+                qaContainer.innerHTML += `
+                    <div class="qa-summary-card">
+                        <div class="qa-summary-header">
+                            <h4>${imageStatus} Image Validation</h4>
+                            <div class="qa-score qa-score-${imageStatusClass}">
+                                ${iv.total_valid_images}/${iv.total_images_found} valid
+                            </div>
+                        </div>
+                        <div class="qa-summary-stats">
+                            <div class="qa-stat">
+                                <div class="qa-stat-number">${iv.total_images_found}</div>
+                                <div class="qa-stat-label">Total Images</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number success">${iv.total_valid_images}</div>
+                                <div class="qa-stat-label">Valid</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number error">${iv.total_broken_images}</div>
+                                <div class="qa-stat-label">Broken</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number warning">${iv.total_missing_alt_text}</div>
+                                <div class="qa-stat-label">Missing Alt</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Accessibility Summary
+            if (siteWideQA.accessibility_audit) {
+                const acc = siteWideQA.accessibility_audit;
+                const accStatusClass = acc.overall_score >= 90 ? 'success' : acc.overall_score >= 70 ? 'warning' : 'error';
+                const accStatus = acc.overall_score >= 90 ? '✅' : acc.overall_score >= 70 ? '⚠️' : '❌';
+                
+                qaContainer.innerHTML += `
+                    <div class="qa-summary-card">
+                        <div class="qa-summary-header">
+                            <h4>${accStatus} Accessibility</h4>
+                            <div class="qa-score qa-score-${accStatusClass}">
+                                ${acc.overall_score}/100
+                            </div>
+                        </div>
+                        <div class="qa-summary-stats">
+                            <div class="qa-stat">
+                                <div class="qa-stat-number error">${acc.total_missing_alt_tags}</div>
+                                <div class="qa-stat-label">Missing Alt Tags</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number error">${acc.total_missing_aria_labels}</div>
+                                <div class="qa-stat-label">Missing ARIA</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // SEO Summary
+            if (siteWideQA.seo_basics) {
+                const seo = siteWideQA.seo_basics;
+                const seoStatusClass = seo.overall_seo_score >= 90 ? 'success' : seo.overall_seo_score >= 70 ? 'warning' : 'error';
+                const seoStatus = seo.overall_seo_score >= 90 ? '✅' : seo.overall_seo_score >= 70 ? '⚠️' : '❌';
+                
+                qaContainer.innerHTML += `
+                    <div class="qa-summary-card">
+                        <div class="qa-summary-header">
+                            <h4>${seoStatus} SEO Basics</h4>
+                            <div class="qa-score qa-score-${seoStatusClass}">
+                                ${seo.overall_seo_score}/100
+                            </div>
+                        </div>
+                        <div class="qa-summary-stats">
+                            <div class="qa-stat">
+                                <div class="qa-stat-number success">${seo.pages_with_title}</div>
+                                <div class="qa-stat-label">Pages with Title</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number success">${seo.pages_with_meta_desc}</div>
+                                <div class="qa-stat-label">Meta Descriptions</div>
+                            </div>
+                            <div class="qa-stat">
+                                <div class="qa-stat-number success">${seo.pages_with_proper_h1}</div>
+                                <div class="qa-stat-label">Proper H1 Tags</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Insert the QA container at the top of the target container
+            if (targetContainer.firstChild) {
+                targetContainer.insertBefore(qaContainer, targetContainer.firstChild);
+            } else {
+                targetContainer.appendChild(qaContainer);
+            }
+            
+            // Make sure the container is visible
+            if (targetContainer.style.display === 'none') {
+                targetContainer.style.display = 'block';
+            }
+            
+            // Scroll to show the QA results
+            qaContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Update the status
+            setTimeout(() => {
+                const crawlStatus = document.getElementById('crawlStatus');
+                crawlStatus.textContent = '✅ Site-wide QA analysis completed!';
+            }, 1000);
+        }
+        
+        function createBrokenLinksDetails(brokenLinksByPage) {
+            let html = '<div class="qa-broken-links-details"><h5>Broken Links by Page:</h5>';
+            for (const [pageUrl, brokenLinks] of Object.entries(brokenLinksByPage)) {
+                html += `<div class="qa-broken-page">
+                    <div class="qa-broken-page-title">${pageUrl} (${brokenLinks.length} broken)</div>
+                    <div class="qa-broken-links-list">`;
+                brokenLinks.forEach(link => {
+                    html += `<div class="qa-broken-link">
+                        <div class="qa-broken-link-url">${link.url}</div>
+                        <div class="qa-broken-link-error">${link.error || 'HTTP ' + link.status_code}</div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // Page Selection and Comparison Functions
+        let selectedPages = new Set();
+        let availablePages = new Map(); // URL -> page data
+
+        function togglePageSelection(url, checked) {
+            if (checked) {
+                selectedPages.add(url);
+            } else {
+                selectedPages.delete(url);
+            }
+            updateSelectionCounter();
+            updateComparisonControlsVisibility();
+        }
+
+        function updateSelectionCounter() {
+            const counter = document.getElementById('selectionCounter');
+            if (counter) {
+                counter.textContent = selectedPages.size;
+                counter.style.display = selectedPages.size > 0 ? 'inline' : 'none';
+            }
+        }
+
+        function updateComparisonControlsVisibility() {
+            const controls = document.getElementById('comparisonControls');
+            if (controls) {
+                controls.style.display = selectedPages.size > 0 ? 'block' : 'none';
+            }
+        }
+
+        function selectAllPages() {
+            const checkboxes = document.querySelectorAll('.page-selector-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+                selectedPages.add(checkbox.dataset.url);
+            });
+            updateSelectionCounter();
+            updateComparisonControlsVisibility();
+        }
+
+        function clearAllSelections() {
+            const checkboxes = document.querySelectorAll('.page-selector-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            selectedPages.clear();
+            updateSelectionCounter();
+            updateComparisonControlsVisibility();
+        }
+
+        function showComparisonModal() {
+            if (selectedPages.size === 0) {
+                alert('Please select at least one page to compare.');
+                return;
+            }
+
+            // Load prompt templates
+            loadPromptTemplates();
+            
+            // Update selected pages list in modal
+            updateSelectedPagesList();
+            
+            // Show modal
+            document.getElementById('comparisonModal').style.display = 'flex';
+        }
+
+        function compareAllPages() {
+            // Get all page URLs from the current crawl
+            const allUrls = Array.from(document.querySelectorAll('.page-selector-checkbox')).map(cb => cb.dataset.url);
+            
+            if (allUrls.length === 0) {
+                alert('No pages available to compare.');
+                return;
+            }
+
+            // Select all pages
+            selectedPages.clear();
+            allUrls.forEach(url => selectedPages.add(url));
+            
+            // Show comparison modal
+            showComparisonModal();
+        }
+
+        function loadPromptTemplates() {
+            fetch('/prompt-templates')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('promptTemplateSelect');
+                    select.innerHTML = '<option value="">Choose a template...</option>';
+                    
+                    data.templates.forEach(template => {
+                        const option = document.createElement('option');
+                        option.value = template.id;
+                        option.textContent = template.name;
+                        option.dataset.description = template.description;
+                        option.dataset.template = template.template;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading prompt templates:', error);
+                });
+        }
+
+        function loadPromptTemplate() {
+            const select = document.getElementById('promptTemplateSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption.value) {
+                const textarea = document.getElementById('comparisonPrompt');
+                textarea.value = selectedOption.dataset.template;
+            }
+        }
+
+        function updateSelectedPagesList() {
+            const container = document.getElementById('selectedPagesList');
+            container.innerHTML = '';
+
+            selectedPages.forEach(url => {
+                const pageItem = document.createElement('div');
+                pageItem.className = 'selected-page-item';
+                pageItem.innerHTML = `
+                    <div class="selected-page-url">${url}</div>
+                    <button class="btn-small" onclick="removePageFromSelection('${url}')">Remove</button>
+                `;
+                container.appendChild(pageItem);
+            });
+
+            if (selectedPages.size === 0) {
+                container.innerHTML = '<div class="text-muted">No pages selected</div>';
+            }
+        }
+
+        function removePageFromSelection(url) {
+            selectedPages.delete(url);
+            
+            // Uncheck the checkbox
+            const checkbox = document.querySelector(`input[data-url="${url}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+
+            updateSelectedPagesList();
+            updateSelectionCounter();
+            updateComparisonControlsVisibility();
+        }
+
+        function closeComparisonModal() {
+            document.getElementById('comparisonModal').style.display = 'none';
+        }
+
+        function startComparison() {
+            const prompt = document.getElementById('comparisonPrompt').value.trim();
+            if (!prompt) {
+                alert('Please enter a comparison prompt.');
+                return;
+            }
+
+            if (selectedPages.size === 0) {
+                alert('Please select at least one page to compare.');
+                return;
+            }
+
+            // Get AI config
+            const aiConfig = getCurrentAIConfig();
+            if (!aiConfig.provider || !aiConfig.apiKey) {
+                alert('Please configure AI provider and API key in the main form.');
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('startComparisonBtn');
+            const btnText = document.getElementById('comparisonBtnText');
+            const loader = document.getElementById('comparisonLoader');
+            
+            btn.disabled = true;
+            btnText.textContent = 'Comparing...';
+            loader.style.display = 'inline-block';
+
+            // Prepare request
+            const comparisonRequest = {
+                urls: Array.from(selectedPages),
+                custom_prompt: prompt,
+                ai_config: {
+                    provider: aiConfig.provider,
+                    model: aiConfig.model,
+                    api_key: aiConfig.apiKey
+                }
+            };
+
+            // Send comparison request
+            fetch('/compare-pages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(comparisonRequest)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Hide comparison modal
+                closeComparisonModal();
+                
+                // Show results modal
+                showComparisonResults(data);
+            })
+            .catch(error => {
+                console.error('Comparison error:', error);
+                alert('Comparison failed: ' + error.message);
+            })
+            .finally(() => {
+                // Reset button state
+                btn.disabled = false;
+                btnText.textContent = 'Start Comparison';
+                loader.style.display = 'none';
+            });
+        }
+
+        function showComparisonResults(data) {
+            const modal = document.getElementById('comparisonResultsModal');
+            const container = document.getElementById('comparisonResults');
+            
+            container.innerHTML = `
+                <div class="comparison-summary">
+                    <h4>Comparison Summary</h4>
+                    <p><strong>Prompt:</strong> ${escapeHtml(data.prompt)}</p>
+                    <p><strong>Pages Analyzed:</strong> ${data.urls.length}</p>
+                    <p><strong>Generated:</strong> ${new Date(data.generated_at).toLocaleString()}</p>
+                </div>
+                
+                <div class="comparison-analysis">
+                    <h4>AI Analysis</h4>
+                    <div class="analysis-content">
+                        ${data.analysis ? formatAnalysisContent(data.analysis) : 'No analysis available'}
+                    </div>
+                </div>
+                
+                <div class="comparison-pages">
+                    <h4>Analyzed Pages</h4>
+                    <div class="pages-list">
+                        ${data.urls.map(url => `
+                            <div class="analyzed-page">
+                                <a href="${url}" target="_blank">${url}</a>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        function formatAnalysisContent(analysis) {
+            // Convert line breaks to HTML and format the analysis
+            return escapeHtml(analysis)
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                .replace(/^/, '<p>')
+                .replace(/$/, '</p>');
+        }
+
+        function closeComparisonResults() {
+            document.getElementById('comparisonResultsModal').style.display = 'none';
+        }
+
+        function exportComparisonResults() {
+            const results = document.getElementById('comparisonResults');
+            const content = results.textContent || results.innerText;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `comparison-results-${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Store page data when pages are loaded
+        function storePage(page) {
+            availablePages.set(page.url, page);
+        }
+
+        // Check if QA results have any issues
+        function checkQAIssues(qaResults) {
+            if (qaResults.link_validation && qaResults.link_validation.broken_links > 0) {
+                return true;
+            }
+            if (qaResults.image_validation && (qaResults.image_validation.broken_images > 0 || qaResults.image_validation.missing_alt_text > 0)) {
+                return true;
+            }
+            if (qaResults.accessibility_audit && qaResults.accessibility_audit.accessibility_score < 80) {
+                return true;
+            }
+            if (qaResults.seo_basics && qaResults.seo_basics.seo_score < 80) {
+                return true;
+            }
+            return false;
+        }
+
+        // Create QA Results Section
+        function createQAResultsSection(qaResults) {
+            const qaId = 'qa-' + Date.now() + Math.random().toString(36).substr(2, 9);
+            let qaContent = '';
+            let summaryText = '';
+            let hasIssues = false;
+
+            // Link Validation
+            if (qaResults.link_validation) {
+                const lv = qaResults.link_validation;
+                const linkStatus = lv.broken_links > 0 ? '❌' : '✅';
+                summaryText += `${linkStatus} ${lv.total_links} links found, ${lv.valid_links} working, ${lv.broken_links} broken`;
+                
+                qaContent += `
+                    <div class="qa-check-item">
+                        <h5>🔗 Link Validation Report</h5>
+                        <div class="qa-summary-card">
+                            <div class="qa-summary-main">
+                                <strong>${lv.total_links} total links found on this page</strong>
+                            </div>
+                            <div class="qa-summary-details">
+                                <span class="qa-detail-item ${lv.valid_links === lv.total_links ? 'success' : 'warning'}">
+                                    ✅ ${lv.valid_links} links working correctly
+                                </span>
+                                <span class="qa-detail-item ${lv.broken_links === 0 ? 'success' : 'error'}">
+                                    ${lv.broken_links > 0 ? '❌' : '✅'} ${lv.broken_links} broken links ${lv.broken_links > 0 ? '(need fixing)' : ''}
+                                </span>
+                                <span class="qa-detail-item">
+                                    🏠 ${lv.internal_links} internal links (same domain)
+                                </span>
+                                <span class="qa-detail-item">
+                                    🌐 ${lv.external_links} external links (other domains)
+                                </span>
+                            </div>
+                        </div>`;
+                
+                if (lv.broken_details && lv.broken_details.length > 0) {
+                    hasIssues = true;
+                    qaContent += '<div class="qa-details"><h6>Broken Links:</h6>';
+                    lv.broken_details.forEach(broken => {
+                        qaContent += `
+                            <div class="qa-issue">
+                                <strong>Text:</strong> "${broken.text || 'No text'}"<br>
+                                <strong>URL:</strong> <a href="${broken.url}" target="_blank">${broken.url}</a><br>
+                                <strong>Error:</strong> ${broken.error} ${broken.status_code ? `(${broken.status_code})` : ''}
+                            </div>`;
+                    });
+                    qaContent += '</div>';
+                }
+                qaContent += '</div>';
+            }
+
+            // Image Validation
+            if (qaResults.image_validation) {
+                const iv = qaResults.image_validation;
+                const imageStatus = iv.broken_images > 0 || iv.missing_alt_text > 0 ? '❌' : '✅';
+                summaryText += ` | ${imageStatus} ${iv.total_images} images found, ${iv.broken_images} broken, ${iv.missing_alt_text} missing alt text`;
+                
+                qaContent += `
+                    <div class="qa-check-item">
+                        <h5>🖼️ Image Validation Report</h5>
+                        <div class="qa-summary-card">
+                            <div class="qa-summary-main">
+                                <strong>${iv.total_images} total images found on this page</strong>
+                            </div>
+                            <div class="qa-summary-details">
+                                <span class="qa-detail-item ${iv.valid_images === iv.total_images && iv.missing_alt_text === 0 ? 'success' : 'warning'}">
+                                    ✅ ${iv.valid_images} images loading correctly
+                                </span>
+                                <span class="qa-detail-item ${iv.broken_images === 0 ? 'success' : 'error'}">
+                                    ${iv.broken_images > 0 ? '❌' : '✅'} ${iv.broken_images} broken images ${iv.broken_images > 0 ? '(404 or loading errors)' : ''}
+                                </span>
+                                <span class="qa-detail-item ${iv.missing_alt_text === 0 ? 'success' : 'warning'}">
+                                    ${iv.missing_alt_text > 0 ? '⚠️' : '✅'} ${iv.missing_alt_text} images missing alt text ${iv.missing_alt_text > 0 ? '(accessibility issue)' : ''}
+                                </span>
+                                <span class="qa-detail-item">
+                                    📊 Accessibility compliance: ${Math.round(((iv.total_images - iv.missing_alt_text) / Math.max(iv.total_images, 1)) * 100)}%
+                                </span>
+                            </div>
+                        </div>`;
+                
+                if (iv.broken_details && iv.broken_details.length > 0) {
+                    hasIssues = true;
+                    qaContent += '<div class="qa-details"><h6>Broken Images:</h6>';
+                    iv.broken_details.forEach(broken => {
+                        qaContent += `
+                            <div class="qa-issue">
+                                <strong>URL:</strong> <a href="${broken.url}" target="_blank">${broken.url}</a><br>
+                                <strong>Alt Text:</strong> "${broken.alt_text || 'None'}"<br>
+                                <strong>Error:</strong> ${broken.error} ${broken.status_code ? `(${broken.status_code})` : ''}
+                            </div>`;
+                    });
+                    qaContent += '</div>';
+                }
+                qaContent += '</div>';
+            }
+
+            // Accessibility Audit
+            if (qaResults.accessibility_audit) {
+                const aa = qaResults.accessibility_audit;
+                const accessibilityStatus = aa.accessibility_score >= 80 ? '✅' : aa.accessibility_score >= 60 ? '⚠️' : '❌';
+                summaryText += ` | ${accessibilityStatus} Accessibility score: ${aa.accessibility_score}/100`;
+                
+                qaContent += `
+                    <div class="qa-check-item">
+                        <h5>♿ Accessibility Audit Report</h5>
+                        <div class="qa-summary-card">
+                            <div class="qa-summary-main">
+                                <strong>Accessibility Score: ${aa.accessibility_score}/100</strong>
+                            </div>
+                            <div class="qa-summary-details">
+                                <span class="qa-detail-item ${aa.accessibility_score >= 80 ? 'success' : aa.accessibility_score >= 60 ? 'warning' : 'error'}">
+                                    ${aa.accessibility_score >= 80 ? '✅' : aa.accessibility_score >= 60 ? '⚠️' : '❌'} 
+                                    Overall accessibility: ${aa.accessibility_score >= 80 ? 'Excellent' : aa.accessibility_score >= 60 ? 'Good' : 'Needs improvement'}
+                                </span>
+                                <span class="qa-detail-item ${aa.missing_alt_tags === 0 ? 'success' : 'error'}">
+                                    ${aa.missing_alt_tags === 0 ? '✅' : '❌'} ${aa.missing_alt_tags} images missing alt text
+                                </span>
+                                ${aa.heading_structure ? `
+                                <span class="qa-detail-item">
+                                    📋 Heading structure: ${aa.heading_structure}
+                                </span>` : ''}
+                            </div>
+                        </div>`;
+                
+                if (aa.issues && aa.issues.length > 0) {
+                    hasIssues = true;
+                    qaContent += '<div class="qa-details"><h6>Accessibility Issues Found:</h6>';
+                    aa.issues.forEach(issue => {
+                        qaContent += `<div class="qa-issue">⚠️ ${issue}</div>`;
+                    });
+                    qaContent += '</div>';
+                }
+                qaContent += '</div>';
+            }
+
+            // SEO Basics
+            if (qaResults.seo_basics) {
+                const seo = qaResults.seo_basics;
+                const seoStatus = seo.seo_score >= 80 ? '✅' : seo.seo_score >= 60 ? '⚠️' : '❌';
+                summaryText += ` | ${seoStatus} SEO score: ${seo.seo_score}/100`;
+                
+                qaContent += `
+                    <div class="qa-check-item">
+                        <h5>📈 SEO Basics Audit Report</h5>
+                        <div class="qa-summary-card">
+                            <div class="qa-summary-main">
+                                <strong>SEO Score: ${seo.seo_score}/100</strong>
+                            </div>
+                            <div class="qa-summary-details">
+                                <span class="qa-detail-item ${seo.seo_score >= 80 ? 'success' : seo.seo_score >= 60 ? 'warning' : 'error'}">
+                                    ${seo.seo_score >= 80 ? '✅' : seo.seo_score >= 60 ? '⚠️' : '❌'} 
+                                    Overall SEO: ${seo.seo_score >= 80 ? 'Excellent' : seo.seo_score >= 60 ? 'Good' : 'Needs improvement'}
+                                </span>
+                                <span class="qa-detail-item ${seo.has_title ? 'success' : 'error'}">
+                                    ${seo.has_title ? '✅' : '❌'} Page title: ${seo.has_title ? `${seo.title_length} characters` : 'Missing'}
+                                    ${seo.has_title && (seo.title_length < 30 || seo.title_length > 60) ? ' (not optimal length)' : ''}
+                                </span>
+                                <span class="qa-detail-item ${seo.has_meta_description ? 'success' : 'error'}">
+                                    ${seo.has_meta_description ? '✅' : '❌'} Meta description: ${seo.has_meta_description ? `${seo.meta_desc_length} characters` : 'Missing'}
+                                    ${seo.has_meta_description && (seo.meta_desc_length < 120 || seo.meta_desc_length > 160) ? ' (not optimal length)' : ''}
+                                </span>
+                                <span class="qa-detail-item ${seo.h1_count === 1 ? 'success' : 'error'}">
+                                    ${seo.h1_count === 1 ? '✅' : '❌'} H1 tags: ${seo.h1_count} found ${seo.h1_count === 1 ? '(perfect)' : seo.h1_count === 0 ? '(missing)' : '(too many)'}
+                                </span>
+                                <span class="qa-detail-item ${seo.heading_order ? 'success' : 'warning'}">
+                                    ${seo.heading_order ? '✅' : '⚠️'} Heading hierarchy: ${seo.heading_order ? 'Proper order' : 'Has issues'}
+                                </span>
+                            </div>
+                        </div>`;
+                
+                if (seo.issues && seo.issues.length > 0) {
+                    hasIssues = true;
+                    qaContent += '<div class="qa-details"><h6>SEO Issues Found:</h6>';
+                    seo.issues.forEach(issue => {
+                        qaContent += `<div class="qa-issue">📈 ${issue}</div>`;
+                    });
+                    qaContent += '</div>';
+                }
+                qaContent += '</div>';
+            }
+
+            return `
+                <div class="content-section qa-section">
+                    <div class="content-header">
+                        <div class="content-title">🔍 Quality Assurance Report</div>
+                        <button class="btn btn-secondary" onclick="toggleContent('${qaId}')">View Details</button>
+                    </div>
+                    <div class="content-preview">
+                        <div class="content-text">${summaryText}</div>
+                        ${hasIssues ? '<div class="qa-warning">⚠️ Issues found - expand for details</div>' : '<div class="qa-success">✅ All checks passed</div>'}
+                    </div>
+                    <div id="${qaId}" class="content-full">${qaContent}</div>
+                </div>`;
+        }
     </script>
+
+    <!-- Comparison Modal -->
+    <div id="comparisonModal" class="comparison-modal" style="display: none;">
+        <div class="comparison-modal-content">
+            <div class="comparison-modal-header">
+                <h3 id="comparisonModalTitle">Compare Pages</h3>
+                <button class="modal-close" onclick="closeComparisonModal()">&times;</button>
+            </div>
+            
+            <div class="comparison-modal-body">
+                <div class="prompt-section">
+                    <label for="comparisonPrompt" class="form-label">Comparison Prompt</label>
+                    <div class="prompt-templates">
+                        <select id="promptTemplateSelect" class="form-input" onchange="loadPromptTemplate()">
+                            <option value="">Choose a template...</option>
+                        </select>
+                    </div>
+                    <textarea id="comparisonPrompt" class="form-input prompt-textarea" rows="4" 
+                              placeholder="Enter your custom comparison prompt here..."></textarea>
+                    <div class="prompt-help">
+                        Your prompt will be followed by the extracted content from each selected page.
+                    </div>
+                </div>
+                
+                <div class="ai-config-section">
+                    <h4>AI Configuration</h4>
+                    <div class="ai-config-grid">
+                        <div class="ai-config-item">
+                            <label for="comparisonAiProvider" class="form-label">Provider</label>
+                            <select id="comparisonAiProvider" class="form-input">
+                                <option value="">No AI Analysis</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="claude">Anthropic</option>
+                                <option value="gemini">Google</option>
+                            </select>
+                        </div>
+                        <div class="ai-config-item">
+                            <label for="comparisonAiModel" class="form-label">Model</label>
+                            <input type="text" id="comparisonAiModel" class="form-input" placeholder="e.g., gpt-4o">
+                        </div>
+                        <div class="ai-config-item">
+                            <label for="comparisonApiKey" class="form-label">API Key</label>
+                            <input type="password" id="comparisonApiKey" class="form-input" placeholder="Enter API key">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="selected-pages-section">
+                    <h4>Pages to Compare</h4>
+                    <div id="selectedPagesList" class="selected-pages-list"></div>
+                </div>
+            </div>
+            
+            <div class="comparison-modal-footer">
+                <button class="btn btn-secondary" onclick="closeComparisonModal()">Cancel</button>
+                <button id="startComparisonBtn" class="btn btn-primary" onclick="startComparison()">
+                    <span id="comparisonBtnText">Start Comparison</span>
+                    <div id="comparisonLoader" class="loader" style="display: none;"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Results Modal -->
+    <div id="comparisonResultsModal" class="comparison-modal" style="display: none;">
+        <div class="comparison-modal-content large">
+            <div class="comparison-modal-header">
+                <h3>Comparison Results</h3>
+                <button class="modal-close" onclick="closeComparisonResults()">&times;</button>
+            </div>
+            
+            <div class="comparison-modal-body">
+                <div id="comparisonResults" class="comparison-results">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+            
+            <div class="comparison-modal-footer">
+                <button class="btn btn-secondary" onclick="exportComparisonResults()">Export Results</button>
+                <button class="btn btn-primary" onclick="closeComparisonResults()">Close</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

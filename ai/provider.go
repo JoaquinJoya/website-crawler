@@ -54,7 +54,7 @@ func (p *PythonProvider) Process(content string, prompt string, ctx context.Cont
 	return strings.TrimSpace(string(output)), nil
 }
 
-func PrepareContentForAI(title, url, content string, headings []map[string]string, paragraphs []string, links []map[string]string, images []map[string]string) string {
+func PrepareContentForAI(title, url, content string, headings []map[string]string, paragraphs []string, links []map[string]string, images []map[string]string, htmlContent, markdown string) string {
 	var result strings.Builder
 	
 	result.WriteString(fmt.Sprintf("Title: %s\n", title))
@@ -99,5 +99,46 @@ func PrepareContentForAI(title, url, content string, headings []map[string]strin
 		result.WriteString("\n")
 	}
 	
+	if markdown != "" {
+		result.WriteString("Markdown Content:\n")
+		// Limit markdown content to avoid overwhelming the AI
+		maxMarkdownLength := 8000
+		if len(markdown) > maxMarkdownLength {
+			result.WriteString(markdown[:maxMarkdownLength])
+			result.WriteString("\n... (Markdown truncated for length)\n\n")
+		} else {
+			result.WriteString(markdown)
+			result.WriteString("\n\n")
+		}
+	}
+	
+	if htmlContent != "" {
+		result.WriteString("HTML Structure:\n")
+		// Include HTML content but limit to reasonable size for AI processing
+		maxHTMLLength := 10000
+		if len(htmlContent) > maxHTMLLength {
+			result.WriteString(htmlContent[:maxHTMLLength])
+			result.WriteString("\n... (HTML truncated for length)\n\n")
+		} else {
+			result.WriteString(htmlContent)
+			result.WriteString("\n\n")
+		}
+	}
+	
 	return result.String()
+}
+
+// ProcessContent is a convenience function for processing content with AI
+func ProcessContent(content, provider, model, apiKey string) (string, error) {
+	config := Config{
+		Provider: provider,
+		Model:    model,
+		APIKey:   apiKey,
+		Prompt:   "Analyze and summarize the following content:",
+	}
+	
+	pythonProvider := NewPythonProvider(config)
+	ctx := context.Background()
+	
+	return pythonProvider.Process(content, config.Prompt, ctx)
 }

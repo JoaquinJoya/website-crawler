@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/PuerkitoBio/goquery"
 
 	"web-crawler/ai"
 	"web-crawler/config"
@@ -36,6 +38,13 @@ type ContentOptions struct {
 	Paragraphs bool `json:"paragraphs"`
 	Links      bool `json:"links"`
 	Images     bool `json:"images"`
+}
+
+type QAOptions struct {
+	ValidateLinks bool `json:"validate_links"`
+	CheckImages   bool `json:"check_images"`
+	Accessibility bool `json:"accessibility"`
+	SEOBasics     bool `json:"seo_basics"`
 }
 
 type TargetSelector struct {
@@ -65,7 +74,113 @@ type PageContent struct {
 	Images      []map[string]string `json:"images,omitempty"`
 	AIAnalysis  string              `json:"ai_analysis,omitempty"`
 	AIPrompt    string              `json:"ai_prompt,omitempty"`
+	QAResults   *QAResults          `json:"qa_results,omitempty"`
 	Error       string              `json:"error,omitempty"`
+}
+
+type QAResults struct {
+	LinkValidation   *LinkValidationResult   `json:"link_validation,omitempty"`
+	ImageValidation  *ImageValidationResult  `json:"image_validation,omitempty"`
+	AccessibilityAudit *AccessibilityResult  `json:"accessibility_audit,omitempty"`
+	SEOBasics        *SEOBasicsResult        `json:"seo_basics,omitempty"`
+}
+
+type SiteWideQAResults struct {
+	TotalPagesAnalyzed int                     `json:"total_pages_analyzed"`
+	LinkValidation     *SiteWideLinkResults    `json:"link_validation,omitempty"`
+	ImageValidation    *SiteWideImageResults   `json:"image_validation,omitempty"`
+	AccessibilityAudit *SiteWideAccessibility  `json:"accessibility_audit,omitempty"`
+	SEOBasics          *SiteWideSEOResults     `json:"seo_basics,omitempty"`
+	PerPageResults     []PageQAResult          `json:"per_page_results,omitempty"`
+}
+
+type SiteWideLinkResults struct {
+	TotalLinksFound   int                    `json:"total_links_found"`
+	TotalValidLinks   int                    `json:"total_valid_links"`
+	TotalBrokenLinks  int                    `json:"total_broken_links"`
+	TotalExternalLinks int                   `json:"total_external_links"`
+	TotalInternalLinks int                   `json:"total_internal_links"`
+	BrokenLinksByPage map[string][]BrokenLinkDetail `json:"broken_links_by_page,omitempty"`
+	UniqueURLsChecked int                    `json:"unique_urls_checked"`
+}
+
+type SiteWideImageResults struct {
+	TotalImagesFound     int                              `json:"total_images_found"`
+	TotalValidImages     int                              `json:"total_valid_images"`
+	TotalBrokenImages    int                              `json:"total_broken_images"`
+	TotalMissingAltText  int                              `json:"total_missing_alt_text"`
+	BrokenImagesByPage   map[string][]BrokenImageDetail   `json:"broken_images_by_page,omitempty"`
+}
+
+type SiteWideAccessibility struct {
+	TotalMissingAltTags    int               `json:"total_missing_alt_tags"`
+	TotalMissingAriaLabels int               `json:"total_missing_aria_labels"`
+	OverallScore           int               `json:"overall_score"`
+	IssuesByPage           map[string][]string `json:"issues_by_page,omitempty"`
+}
+
+type SiteWideSEOResults struct {
+	PagesWithTitle         int               `json:"pages_with_title"`
+	PagesWithMetaDesc      int               `json:"pages_with_meta_desc"`
+	PagesWithProperH1      int               `json:"pages_with_proper_h1"`
+	OverallSEOScore        int               `json:"overall_seo_score"`
+	IssuesByPage           map[string][]string `json:"issues_by_page,omitempty"`
+}
+
+type PageQAResult struct {
+	URL       string     `json:"url"`
+	Title     string     `json:"title"`
+	QAResults *QAResults `json:"qa_results"`
+}
+
+type LinkValidationResult struct {
+	TotalLinks    int                    `json:"total_links"`
+	ValidLinks    int                    `json:"valid_links"`
+	BrokenLinks   int                    `json:"broken_links"`
+	ExternalLinks int                    `json:"external_links"`
+	InternalLinks int                    `json:"internal_links"`
+	BrokenDetails []BrokenLinkDetail     `json:"broken_details,omitempty"`
+}
+
+type BrokenLinkDetail struct {
+	URL        string `json:"url"`
+	Text       string `json:"text"`
+	StatusCode int    `json:"status_code"`
+	Error      string `json:"error"`
+}
+
+type ImageValidationResult struct {
+	TotalImages    int                  `json:"total_images"`
+	ValidImages    int                  `json:"valid_images"`
+	BrokenImages   int                  `json:"broken_images"`
+	MissingAltText int                  `json:"missing_alt_text"`
+	BrokenDetails  []BrokenImageDetail  `json:"broken_details,omitempty"`
+}
+
+type BrokenImageDetail struct {
+	URL        string `json:"url"`
+	AltText    string `json:"alt_text"`
+	StatusCode int    `json:"status_code"`
+	Error      string `json:"error"`
+}
+
+type AccessibilityResult struct {
+	MissingAltTags     int      `json:"missing_alt_tags"`
+	MissingAriaLabels  int      `json:"missing_aria_labels"`
+	HeadingStructure   string   `json:"heading_structure"`
+	AccessibilityScore int      `json:"accessibility_score"`
+	Issues             []string `json:"issues,omitempty"`
+}
+
+type SEOBasicsResult struct {
+	HasTitle          bool     `json:"has_title"`
+	HasMetaDescription bool    `json:"has_meta_description"`
+	TitleLength       int      `json:"title_length"`
+	MetaDescLength    int      `json:"meta_desc_length"`
+	H1Count           int      `json:"h1_count"`
+	HeadingOrder      bool     `json:"heading_order"`
+	SEOScore          int      `json:"seo_score"`
+	Issues            []string `json:"issues,omitempty"`
 }
 
 type CrawlResponse struct {
@@ -74,6 +189,31 @@ type CrawlResponse struct {
 	Pages []PageContent `json:"pages"`
 	Count int           `json:"count"`
 	Error string        `json:"error,omitempty"`
+}
+
+// Comparison structs
+type ComparisonRequest struct {
+	URLs         []string `json:"urls" binding:"required"`
+	CustomPrompt string   `json:"custom_prompt"`
+	AIConfig     AIConfig `json:"ai_config"`
+	CompareAll   bool     `json:"compare_all"`
+}
+
+type PromptTemplate struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Template    string `json:"template"`
+}
+
+type ComparisonResponse struct {
+	SessionID   string         `json:"session_id"`
+	URLs        []string       `json:"urls"`
+	Analysis    string         `json:"analysis"`
+	Pages       []PageContent  `json:"pages"`
+	Prompt      string         `json:"prompt"`
+	GeneratedAt time.Time      `json:"generated_at"`
+	Error       string         `json:"error,omitempty"`
 }
 
 // Server type
@@ -119,6 +259,10 @@ func (s *Server) SetupRoutes() {
 	s.router.GET("/monitoring", s.monitoringHandler)
 	s.router.GET("/monitoring/stats", s.monitoringStatsHandler)
 	s.router.GET("/monitoring/language-sync", s.languageSyncHandler)
+	
+	// Comparison endpoints
+	s.router.POST("/compare-pages", s.comparePagesHandler)
+	s.router.GET("/prompt-templates", s.promptTemplatesHandler)
 }
 
 func (s *Server) Run() error {
@@ -173,6 +317,13 @@ func (s *Server) streamCrawlHandler(c *gin.Context) {
 		Paragraphs: c.Query("paragraphs") == "true",
 		Links:      c.Query("links") == "true",
 		Images:     c.Query("images") == "true",
+	}
+
+	qaOptions := QAOptions{
+		ValidateLinks: c.Query("qa_validate_links") == "true",
+		CheckImages:   c.Query("qa_check_images") == "true",
+		Accessibility: c.Query("qa_accessibility") == "true",
+		SEOBasics:     c.Query("qa_seo_basics") == "true",
 	}
 
 	var targetSelector *TargetSelector
@@ -248,10 +399,10 @@ func (s *Server) streamCrawlHandler(c *gin.Context) {
 
 	c.SSEvent("urls", gin.H{"urls": urls, "count": len(urls)})
 
-	s.streamPageContents(c, urls, ctx, options, aiConfig, targetSelector, maxPages)
+	s.streamPageContents(c, urls, ctx, options, aiConfig, targetSelector, maxPages, qaOptions)
 }
 
-func (s *Server) streamPageContents(c *gin.Context, urls []string, ctx context.Context, options ContentOptions, aiConfig AIConfig, targetSelector *TargetSelector, maxPages int) {
+func (s *Server) streamPageContents(c *gin.Context, urls []string, ctx context.Context, options ContentOptions, aiConfig AIConfig, targetSelector *TargetSelector, maxPages int, qaOptions QAOptions) {
 	cfg := config.Load()
 	
 	// Use Colly or traditional crawler based on configuration
@@ -275,6 +426,10 @@ func (s *Server) streamPageContents(c *gin.Context, urls []string, ctx context.C
 
 	var processedCount int32
 	totalURLs := len(urls)
+	
+	// Track all pages for site-wide QA analysis
+	var allPages []PageContent
+	var pagesMutex sync.Mutex
 	
 	semaphore := make(chan struct{}, 5)
 	fetcher := crawler.NewPageFetcherWithBackend(cfg.Colly.Enabled, collyConfig)
@@ -323,7 +478,7 @@ func (s *Server) streamPageContents(c *gin.Context, urls []string, ctx context.C
 			var page PageContent
 			
 			for attempt := 1; attempt <= 3; attempt++ {
-				page = fetchPageContent(pageURL, pageCtx, options, aiConfig, targetSelector, fetcher)
+				page = fetchPageContent(pageURL, pageCtx, options, aiConfig, targetSelector, fetcher, qaOptions)
 				
 				if page.Error == "" {
 					break
@@ -339,6 +494,11 @@ func (s *Server) streamPageContents(c *gin.Context, urls []string, ctx context.C
 					page.Content = fmt.Sprintf("Error: %s", page.Error)
 				}
 			}
+			
+			// Store page for site-wide QA analysis
+			pagesMutex.Lock()
+			allPages = append(allPages, page)
+			pagesMutex.Unlock()
 			
 			data, err := json.Marshal(page)
 			if err != nil {
@@ -369,6 +529,33 @@ func (s *Server) streamPageContents(c *gin.Context, urls []string, ctx context.C
 	wg.Wait()
 	
 	finalCount := atomic.LoadInt32(&processedCount)
+	
+	// Perform site-wide QA analysis if any QA options were selected
+	if qaOptions.ValidateLinks || qaOptions.CheckImages || qaOptions.Accessibility || qaOptions.SEOBasics {
+		select {
+		case <-clientGone:
+			return
+		default:
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						fmt.Printf("Error performing site-wide QA: %v\n", r)
+					}
+				}()
+				
+				fmt.Printf("[SITE-WIDE QA] Starting site-wide analysis for %d pages\n", len(allPages))
+				siteWideQA := performSiteWideQA(allPages, qaOptions, ctx)
+				
+				qaData, err := json.Marshal(siteWideQA)
+				if err == nil {
+					c.SSEvent("sitewide_qa", string(qaData))
+					if flusher, ok := c.Writer.(http.Flusher); ok {
+						flusher.Flush()
+					}
+				}
+			}()
+		}
+	}
 	
 	select {
 	case <-clientGone:
@@ -433,15 +620,16 @@ func fetchPageContents(urls []string, ctx context.Context, useColly bool, collyC
 	
 	for _, pageURL := range urls {
 		page := fetchPageContent(pageURL, ctx, ContentOptions{
-			Head: true, HTML: true, Text: true,
-		}, AIConfig{}, nil, fetcher)
+			Head: true, HTML: true, Text: true, Markdown: true,
+			Headings: true, Paragraphs: true, Links: true, Images: true,
+		}, AIConfig{}, nil, fetcher, QAOptions{})
 		pages = append(pages, page)
 	}
 	
 	return pages
 }
 
-func fetchPageContent(pageURL string, ctx context.Context, options ContentOptions, aiConfig AIConfig, targetSelector *TargetSelector, fetcher crawler.PageFetcherInterface) PageContent {
+func fetchPageContent(pageURL string, ctx context.Context, options ContentOptions, aiConfig AIConfig, targetSelector *TargetSelector, fetcher crawler.PageFetcherInterface, qaOptions QAOptions) PageContent {
 	doc, err := fetcher.FetchDocument(pageURL, ctx)
 	if err != nil {
 		return PageContent{
@@ -519,7 +707,7 @@ func fetchPageContent(pageURL string, ctx context.Context, options ContentOption
 	}
 
 	if aiConfig.Provider != "" && aiConfig.APIKey != "" && aiConfig.Prompt != "" {
-		content := ai.PrepareContentForAI(page.Title, page.URL, page.Content, page.Headings, page.Paragraphs, page.Links, page.Images)
+		content := ai.PrepareContentForAI(page.Title, page.URL, page.Content, page.Headings, page.Paragraphs, page.Links, page.Images, page.HTMLContent, page.Markdown)
 		fullPrompt := fmt.Sprintf("%s\n\nContent to analyze:\n%s", aiConfig.Prompt, content)
 		page.AIPrompt = fullPrompt
 		
@@ -535,6 +723,11 @@ func fetchPageContent(pageURL string, ctx context.Context, options ContentOption
 		} else {
 			page.AIAnalysis = fmt.Sprintf("AI Processing Error: %v", err)
 		}
+	}
+
+	// Perform QA checks if requested
+	if qaOptions.ValidateLinks || qaOptions.CheckImages || qaOptions.Accessibility || qaOptions.SEOBasics {
+		page.QAResults = performQAChecks(workingDoc, page, pageURL, qaOptions, ctx)
 	}
 
 	return page
@@ -714,7 +907,7 @@ func (s *Server) retryAIHandler(c *gin.Context) {
 
 	// Process with AI
 	if aiConfig.Provider != "" && aiConfig.APIKey != "" && aiConfig.Prompt != "" {
-		content := ai.PrepareContentForAI(page.Title, page.URL, page.Content, page.Headings, page.Paragraphs, page.Links, page.Images)
+		content := ai.PrepareContentForAI(page.Title, page.URL, page.Content, page.Headings, page.Paragraphs, page.Links, page.Images, page.HTMLContent, page.Markdown)
 		fullPrompt := fmt.Sprintf("%s\n\nContent to analyze:\n%s", aiConfig.Prompt, content)
 		page.AIPrompt = fullPrompt
 		
@@ -980,4 +1173,1046 @@ func (s *Server) extractAdditionalHandler(c *gin.Context) {
 		"extracted_types": request.ContentTypes,
 		"from_cache": request.UseCache,
 	})
+}
+
+// Comparison handlers
+func (s *Server) comparePagesHandler(c *gin.Context) {
+	var req ComparisonRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, ComparisonResponse{
+			Error: "Invalid comparison request: " + err.Error(),
+		})
+		return
+	}
+
+	// Validate URLs
+	if len(req.URLs) == 0 {
+		c.JSON(http.StatusBadRequest, ComparisonResponse{
+			Error: "At least one URL is required for comparison",
+		})
+		return
+	}
+
+	if len(req.URLs) > 50 {
+		c.JSON(http.StatusBadRequest, ComparisonResponse{
+			Error: "Maximum 50 URLs allowed for comparison",
+		})
+		return
+	}
+
+	// Extract content from all URLs
+	var pages []PageContent
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var extractionErrors []string
+
+	for _, pageURL := range req.URLs {
+		wg.Add(1)
+		go func(url string) {
+			defer wg.Done()
+			
+			// Crawl individual page with full content extraction
+			_, pageContents, err := crawlURLWithContent(url)
+			if err != nil {
+				mu.Lock()
+				extractionErrors = append(extractionErrors, fmt.Sprintf("Error crawling %s: %s", url, err.Error()))
+				mu.Unlock()
+				return
+			}
+
+			// Find the main page (usually the first one with the exact URL)
+			for _, page := range pageContents {
+				if page.URL == url || strings.Contains(page.URL, url) {
+					mu.Lock()
+					pages = append(pages, page)
+					mu.Unlock()
+					break
+				}
+			}
+		}(pageURL)
+	}
+
+	wg.Wait()
+
+	if len(pages) == 0 {
+		errorMsg := "No content could be extracted from the provided URLs"
+		if len(extractionErrors) > 0 {
+			errorMsg = strings.Join(extractionErrors, "; ")
+		}
+		c.JSON(http.StatusBadRequest, ComparisonResponse{
+			Error: errorMsg,
+		})
+		return
+	}
+
+	// Prepare comparison prompt
+	comparisonPrompt := req.CustomPrompt
+	if comparisonPrompt == "" {
+		comparisonPrompt = "Compare and analyze the content, messaging, and structure of the following pages. Identify key differences, similarities, and patterns."
+	}
+
+	// Generate AI analysis if AI config is provided
+	var analysis string
+	if req.AIConfig.Provider != "" && req.AIConfig.APIKey != "" {
+		formattedContent := formatMultiPageContent(pages, comparisonPrompt)
+		
+		if result, err := ai.ProcessContent(formattedContent, req.AIConfig.Provider, req.AIConfig.Model, req.AIConfig.APIKey); err == nil {
+			analysis = result
+		} else {
+			analysis = "AI analysis failed: " + err.Error()
+		}
+	}
+
+	// Generate session ID
+	sessionID := fmt.Sprintf("comp_%d", time.Now().Unix())
+
+	response := ComparisonResponse{
+		SessionID:   sessionID,
+		URLs:        req.URLs,
+		Analysis:    analysis,
+		Pages:       pages,
+		Prompt:      comparisonPrompt,
+		GeneratedAt: time.Now(),
+	}
+
+	if len(extractionErrors) > 0 {
+		response.Error = "Some pages could not be processed: " + strings.Join(extractionErrors, "; ")
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (s *Server) promptTemplatesHandler(c *gin.Context) {
+	templates := []PromptTemplate{
+		{
+			ID:          "content_comparison",
+			Name:        "Content Comparison",
+			Description: "Compare main content themes and messaging",
+			Template:    "Compare the main content, messaging, and value propositions of the following pages. Identify similarities, differences, and which approach might be most effective:",
+		},
+		{
+			ID:          "seo_analysis",
+			Name:        "SEO Analysis",
+			Description: "Compare SEO elements and optimization",
+			Template:    "Analyze the SEO elements of these pages including titles, meta descriptions, headings structure, and content optimization. Identify which pages are better optimized and provide recommendations:",
+		},
+		{
+			ID:          "design_patterns",
+			Name:        "Design & UX Patterns",
+			Description: "Compare layout, navigation, and user experience",
+			Template:    "Compare the design patterns, navigation structure, layout, and user experience elements of these pages. Identify which design approaches work best and why:",
+		},
+		{
+			ID:          "conversion_focus",
+			Name:        "Conversion Analysis",
+			Description: "Compare calls-to-action and conversion elements",
+			Template:    "Analyze the conversion elements, calls-to-action, forms, and persuasion techniques used on these pages. Compare their effectiveness and provide recommendations for optimization:",
+		},
+		{
+			ID:          "content_strategy",
+			Name:        "Content Strategy",
+			Description: "Compare content strategy and audience targeting",
+			Template:    "Compare the content strategy, tone of voice, audience targeting, and messaging approach across these pages. Identify which strategy is most effective for different goals:",
+		},
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"templates": templates,
+	})
+}
+
+// Helper function to format multiple pages content for AI analysis
+func formatMultiPageContent(pages []PageContent, customPrompt string) string {
+	var content strings.Builder
+	
+	content.WriteString(customPrompt)
+	content.WriteString("\n\n--- PAGES TO COMPARE ---\n\n")
+	
+	for i, page := range pages {
+		content.WriteString(fmt.Sprintf("=== PAGE %d: %s ===\n", i+1, page.URL))
+		content.WriteString(fmt.Sprintf("Title: %s\n\n", page.Title))
+		
+		if page.Content != "" {
+			content.WriteString("Content:\n")
+			content.WriteString(page.Content)
+			content.WriteString("\n\n")
+		}
+		
+		if len(page.Headings) > 0 {
+			content.WriteString("Headings:\n")
+			for _, heading := range page.Headings {
+				content.WriteString(fmt.Sprintf("- %s: %s\n", heading["level"], heading["text"]))
+			}
+			content.WriteString("\n")
+		}
+		
+		if page.Markdown != "" {
+			content.WriteString("Markdown Content:\n")
+			maxMarkdownLength := 8000
+			if len(page.Markdown) > maxMarkdownLength {
+				content.WriteString(page.Markdown[:maxMarkdownLength])
+				content.WriteString("\n... (Markdown truncated for length)\n\n")
+			} else {
+				content.WriteString(page.Markdown)
+				content.WriteString("\n\n")
+			}
+		}
+		
+		if len(page.Paragraphs) > 0 {
+			content.WriteString("Paragraphs:\n")
+			for i, paragraph := range page.Paragraphs {
+				if i >= 10 { // Limit to first 10 paragraphs to avoid overwhelming the AI
+					content.WriteString(fmt.Sprintf("... and %d more paragraphs\n", len(page.Paragraphs)-i))
+					break
+				}
+				content.WriteString(fmt.Sprintf("Paragraph %d: %s\n", i+1, paragraph))
+			}
+			content.WriteString("\n")
+		}
+		
+		if len(page.Links) > 0 {
+			content.WriteString("Links:\n")
+			for i, link := range page.Links {
+				if i >= 20 { // Limit to first 20 links
+					content.WriteString(fmt.Sprintf("... and %d more links\n", len(page.Links)-i))
+					break
+				}
+				content.WriteString(fmt.Sprintf("- %s: %s\n", link["text"], link["url"]))
+			}
+			content.WriteString("\n")
+		}
+		
+		if len(page.Images) > 0 {
+			content.WriteString("Images:\n")
+			for i, image := range page.Images {
+				if i >= 10 { // Limit to first 10 images
+					content.WriteString(fmt.Sprintf("... and %d more images\n", len(page.Images)-i))
+					break
+				}
+				altText := image["alt"]
+				if altText == "" {
+					altText = "No alt text"
+				}
+				content.WriteString(fmt.Sprintf("- %s (Alt: %s)\n", image["url"], altText))
+			}
+			content.WriteString("\n")
+		}
+		
+		if page.HTMLContent != "" {
+			content.WriteString("HTML Structure:\n")
+			// Include full HTML content, but limit to reasonable size for AI processing
+			maxHTMLLength := 10000
+			if len(page.HTMLContent) > maxHTMLLength {
+				content.WriteString(page.HTMLContent[:maxHTMLLength])
+				content.WriteString("\n... (HTML truncated for length)\n\n")
+			} else {
+				content.WriteString(page.HTMLContent)
+				content.WriteString("\n\n")
+			}
+		}
+		
+		content.WriteString("---\n\n")
+	}
+	
+	return content.String()
+}
+
+// Helper function for min
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// performQAChecks performs quality assurance checks on the page content
+func performQAChecks(doc interface{}, page PageContent, pageURL string, qaOptions QAOptions, ctx context.Context) *QAResults {
+	results := &QAResults{}
+
+	if qaOptions.ValidateLinks {
+		// Extract links directly from the HTML document for QA
+		links := extractAllLinksForQA(doc, pageURL)
+		
+		// Debug: Log the number of links found
+		fmt.Printf("[QA DEBUG] Found %d links on page %s\n", len(links), pageURL)
+		if len(links) > 0 {
+			fmt.Printf("[QA DEBUG] First few links: ")
+			for i, link := range links[:min(3, len(links))] {
+				if i > 0 {
+					fmt.Printf(", ")
+				}
+				fmt.Printf("%s", link["url"])
+			}
+			fmt.Printf("\n")
+		}
+		
+		results.LinkValidation = validateLinks(links, pageURL, ctx)
+	}
+
+	if qaOptions.CheckImages {
+		// Extract images directly from the HTML document for QA
+		images := extractAllImagesForQA(doc, pageURL)
+		results.ImageValidation = validateImages(images, ctx)
+	}
+
+	if qaOptions.Accessibility {
+		// Use extracted images and headings for accessibility check
+		images := extractAllImagesForQA(doc, pageURL)
+		results.AccessibilityAudit = checkAccessibility(images, page.Headings)
+	}
+
+	if qaOptions.SEOBasics {
+		results.SEOBasics = checkSEOBasics(page.HeadData, page.Headings)
+	}
+
+	return results
+}
+
+// extractAllLinksForQA extracts ALL links from the HTML document using goquery
+func extractAllLinksForQA(doc interface{}, pageURL string) []map[string]string {
+	// Type assert to goquery document
+	gqDoc, ok := doc.(*goquery.Document)
+	if !ok {
+		fmt.Printf("[QA DEBUG] Document type assertion failed for %s\n", pageURL)
+		return []map[string]string{}
+	}
+
+	var links []map[string]string
+	base, err := url.Parse(pageURL)
+	if err != nil {
+		fmt.Printf("[QA DEBUG] Failed to parse base URL %s: %v\n", pageURL, err)
+		return links
+	}
+
+	// Debug: Check if document has any content
+	htmlContent, _ := gqDoc.Html()
+	fmt.Printf("[QA DEBUG] Document HTML length: %d characters\n", len(htmlContent))
+
+	// Find ALL anchor tags (including those without href for debugging)
+	allAnchorCount := 0
+	gqDoc.Find("a").Each(func(i int, s *goquery.Selection) {
+		allAnchorCount++
+	})
+	fmt.Printf("[QA DEBUG] Total anchor tags found: %d\n", allAnchorCount)
+
+	// Find ALL anchor tags with href attributes
+	gqDoc.Find("a[href]").Each(func(i int, s *goquery.Selection) {
+		href, exists := s.Attr("href")
+		if !exists || href == "" {
+			return
+		}
+
+		text := strings.TrimSpace(s.Text())
+		if text == "" {
+			// If no text, try to get aria-label or title
+			if ariaLabel, hasAria := s.Attr("aria-label"); hasAria {
+				text = ariaLabel
+			} else if title, hasTitle := s.Attr("title"); hasTitle {
+				text = title
+			} else {
+				text = href // fallback to href
+			}
+		}
+
+		// Create link entry
+		link := map[string]string{
+			"url":  href,
+			"text": text,
+		}
+
+		// Try to resolve relative URLs
+		if parsedURL, err := url.Parse(href); err == nil {
+			resolvedURL := base.ResolveReference(parsedURL)
+			link["url"] = resolvedURL.String()
+		}
+
+		// Add additional attributes if present
+		if title, hasTitle := s.Attr("title"); hasTitle {
+			link["title"] = title
+		}
+
+		if class, hasClass := s.Attr("class"); hasClass {
+			link["class"] = class
+		}
+
+		if id, hasID := s.Attr("id"); hasID {
+			link["id"] = id
+		}
+
+		links = append(links, link)
+	})
+
+	fmt.Printf("[QA DEBUG] Anchor tags with href found: %d\n", len(links))
+
+	// Also check for JavaScript-based navigation (onclick handlers, etc.)
+	jsLinkCount := 0
+	gqDoc.Find("[onclick*='location'], [onclick*='window.open'], [onclick*='href']").Each(func(i int, s *goquery.Selection) {
+		onclick, exists := s.Attr("onclick")
+		if !exists {
+			return
+		}
+
+		// Extract URLs from onclick handlers using regex
+		urlRegex := regexp.MustCompile(`(?:location\.href|window\.open|href)\s*=\s*['"]([^'"]+)['"]`)
+		matches := urlRegex.FindStringSubmatch(onclick)
+		if len(matches) > 1 {
+			href := matches[1]
+			text := strings.TrimSpace(s.Text())
+			if text == "" {
+				text = "JavaScript link"
+			}
+
+			link := map[string]string{
+				"url":  href,
+				"text": text,
+				"type": "javascript",
+			}
+
+			// Try to resolve relative URLs
+			if parsedURL, err := url.Parse(href); err == nil {
+				resolvedURL := base.ResolveReference(parsedURL)
+				link["url"] = resolvedURL.String()
+			}
+
+			links = append(links, link)
+			jsLinkCount++
+		}
+	})
+
+	fmt.Printf("[QA DEBUG] JavaScript links found: %d\n", jsLinkCount)
+	fmt.Printf("[QA DEBUG] Total links extracted: %d\n", len(links))
+
+	return links
+}
+
+// extractAllImagesForQA extracts ALL images from the HTML document using goquery
+func extractAllImagesForQA(doc interface{}, pageURL string) []map[string]string {
+	// Type assert to goquery document
+	gqDoc, ok := doc.(*goquery.Document)
+	if !ok {
+		return []map[string]string{}
+	}
+
+	var images []map[string]string
+	base, err := url.Parse(pageURL)
+	if err != nil {
+		return images
+	}
+
+	// Find ALL img tags
+	gqDoc.Find("img").Each(func(i int, s *goquery.Selection) {
+		src, exists := s.Attr("src")
+		if !exists || src == "" {
+			// Check for data-src (lazy loading)
+			if dataSrc, hasDataSrc := s.Attr("data-src"); hasDataSrc {
+				src = dataSrc
+			} else {
+				return
+			}
+		}
+
+		image := map[string]string{
+			"url": src,
+		}
+
+		// Try to resolve relative URLs
+		if parsedURL, err := url.Parse(src); err == nil {
+			resolvedURL := base.ResolveReference(parsedURL)
+			image["url"] = resolvedURL.String()
+		}
+
+		// Get alt text
+		if alt, hasAlt := s.Attr("alt"); hasAlt {
+			image["alt"] = alt
+		} else {
+			image["alt"] = "" // Explicitly mark as missing
+		}
+
+		// Get additional attributes
+		if title, hasTitle := s.Attr("title"); hasTitle {
+			image["title"] = title
+		}
+
+		if width, hasWidth := s.Attr("width"); hasWidth {
+			image["width"] = width
+		}
+
+		if height, hasHeight := s.Attr("height"); hasHeight {
+			image["height"] = height
+		}
+
+		images = append(images, image)
+	})
+
+	// Also check for CSS background images
+	gqDoc.Find("[style*='background-image']").Each(func(i int, s *goquery.Selection) {
+		style, exists := s.Attr("style")
+		if !exists {
+			return
+		}
+
+		// Extract URLs from background-image CSS
+		urlRegex := regexp.MustCompile(`background-image:\s*url\(['"]?([^'"()]+)['"]?\)`)
+		matches := urlRegex.FindStringSubmatch(style)
+		if len(matches) > 1 {
+			src := matches[1]
+
+			image := map[string]string{
+				"url":  src,
+				"alt":  "", // Background images don't have alt text
+				"type": "background",
+			}
+
+			// Try to resolve relative URLs
+			if parsedURL, err := url.Parse(src); err == nil {
+				resolvedURL := base.ResolveReference(parsedURL)
+				image["url"] = resolvedURL.String()
+			}
+
+			images = append(images, image)
+		}
+	})
+
+	return images
+}
+
+// validateLinks checks all links for broken/404 responses
+func validateLinks(links []map[string]string, baseURL string, ctx context.Context) *LinkValidationResult {
+	result := &LinkValidationResult{
+		TotalLinks: len(links),
+		BrokenDetails: []BrokenLinkDetail{},
+	}
+
+	if len(links) == 0 {
+		return result
+	}
+
+	// Parse base URL for relative link resolution
+	base, err := url.Parse(baseURL)
+	if err != nil {
+		return result
+	}
+
+	// Track unique URLs to avoid duplicate checks
+	checkedURLs := make(map[string]bool)
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	
+	// Limit concurrent requests to avoid overwhelming servers
+	semaphore := make(chan struct{}, 10)
+
+	for _, link := range links {
+		linkURL := link["url"]
+		linkText := link["text"]
+
+		// Skip empty URLs, anchors, and non-HTTP(S) links
+		if linkURL == "" || strings.HasPrefix(linkURL, "#") || 
+		   strings.HasPrefix(linkURL, "mailto:") || 
+		   strings.HasPrefix(linkURL, "tel:") ||
+		   strings.HasPrefix(linkURL, "javascript:") {
+			continue
+		}
+
+		// Resolve relative URLs
+		resolvedURL, err := base.Parse(linkURL)
+		if err != nil {
+			mu.Lock()
+			result.BrokenLinks++
+			result.BrokenDetails = append(result.BrokenDetails, BrokenLinkDetail{
+				URL: linkURL,
+				Text: linkText,
+				Error: "Invalid URL format",
+			})
+			mu.Unlock()
+			continue
+		}
+
+		urlString := resolvedURL.String()
+		
+		// Skip if we've already checked this URL
+		mu.Lock()
+		if checkedURLs[urlString] {
+			mu.Unlock()
+			continue
+		}
+		checkedURLs[urlString] = true
+		mu.Unlock()
+
+		// Check if internal or external
+		mu.Lock()
+		if resolvedURL.Host == base.Host {
+			result.InternalLinks++
+		} else {
+			result.ExternalLinks++
+		}
+		mu.Unlock()
+
+		// Validate the link concurrently
+		wg.Add(1)
+		go func(url, text string) {
+			defer wg.Done()
+			
+			// Acquire semaphore
+			semaphore <- struct{}{}
+			defer func() { <-semaphore }()
+			
+			if status, err := checkURLStatus(url, ctx); err != nil || status >= 400 {
+				mu.Lock()
+				result.BrokenLinks++
+				result.BrokenDetails = append(result.BrokenDetails, BrokenLinkDetail{
+					URL: url,
+					Text: text,
+					StatusCode: status,
+					Error: func() string {
+						if err != nil {
+							return err.Error()
+						}
+						return fmt.Sprintf("HTTP %d", status)
+					}(),
+				})
+				mu.Unlock()
+			} else {
+				mu.Lock()
+				result.ValidLinks++
+				mu.Unlock()
+			}
+		}(urlString, linkText)
+	}
+
+	// Wait for all link checks to complete
+	wg.Wait()
+
+	return result
+}
+
+// validateImages checks all images for broken/404 responses and missing alt text
+func validateImages(images []map[string]string, ctx context.Context) *ImageValidationResult {
+	if len(images) == 0 {
+		return &ImageValidationResult{
+			TotalImages: 0,
+			ValidImages: 0,
+			BrokenImages: 0,
+			MissingAltText: 0,
+		}
+	}
+
+	result := &ImageValidationResult{
+		TotalImages: len(images),
+		BrokenDetails: []BrokenImageDetail{},
+	}
+
+	for _, image := range images {
+		imageURL := image["url"]
+		altText := image["alt"]
+
+		// Check for missing alt text
+		if altText == "" {
+			result.MissingAltText++
+		}
+
+		// Skip data URLs and relative URLs for now
+		if strings.HasPrefix(imageURL, "data:") || !strings.HasPrefix(imageURL, "http") {
+			continue
+		}
+
+		// Validate the image URL
+		if status, err := checkURLStatus(imageURL, ctx); err != nil || status >= 400 {
+			result.BrokenImages++
+			result.BrokenDetails = append(result.BrokenDetails, BrokenImageDetail{
+				URL: imageURL,
+				AltText: altText,
+				StatusCode: status,
+				Error: err.Error(),
+			})
+		} else {
+			result.ValidImages++
+		}
+	}
+
+	return result
+}
+
+// checkAccessibility performs basic accessibility checks
+func checkAccessibility(images []map[string]string, headings []map[string]string) *AccessibilityResult {
+	result := &AccessibilityResult{
+		Issues: []string{},
+	}
+
+	// Check missing alt tags
+	for _, image := range images {
+		if image["alt"] == "" {
+			result.MissingAltTags++
+		}
+	}
+
+	// Analyze heading structure
+	if len(headings) > 0 {
+		result.HeadingStructure = analyzeHeadingStructure(headings)
+	}
+
+	// Calculate accessibility score (0-100)
+	score := 100
+	if result.MissingAltTags > 0 {
+		score -= min(result.MissingAltTags*10, 50) // Reduce up to 50 points for missing alt tags
+	}
+
+	if len(result.Issues) > 0 {
+		score -= len(result.Issues) * 5 // Reduce 5 points per issue
+	}
+
+	result.AccessibilityScore = max(score, 0)
+
+	return result
+}
+
+// checkSEOBasics performs basic SEO checks
+func checkSEOBasics(headData map[string]string, headings []map[string]string) *SEOBasicsResult {
+	result := &SEOBasicsResult{
+		Issues: []string{},
+	}
+
+	// Check title
+	title := headData["title"]
+	result.HasTitle = title != ""
+	result.TitleLength = len(title)
+
+	if !result.HasTitle {
+		result.Issues = append(result.Issues, "Missing page title")
+	} else if result.TitleLength < 30 {
+		result.Issues = append(result.Issues, "Title too short (recommended: 30-60 characters)")
+	} else if result.TitleLength > 60 {
+		result.Issues = append(result.Issues, "Title too long (recommended: 30-60 characters)")
+	}
+
+	// Check meta description
+	metaDesc := headData["description"]
+	result.HasMetaDescription = metaDesc != ""
+	result.MetaDescLength = len(metaDesc)
+
+	if !result.HasMetaDescription {
+		result.Issues = append(result.Issues, "Missing meta description")
+	} else if result.MetaDescLength < 120 {
+		result.Issues = append(result.Issues, "Meta description too short (recommended: 120-160 characters)")
+	} else if result.MetaDescLength > 160 {
+		result.Issues = append(result.Issues, "Meta description too long (recommended: 120-160 characters)")
+	}
+
+	// Check H1 tags
+	h1Count := 0
+	for _, heading := range headings {
+		if heading["level"] == "h1" {
+			h1Count++
+		}
+	}
+	result.H1Count = h1Count
+
+	if h1Count == 0 {
+		result.Issues = append(result.Issues, "Missing H1 tag")
+	} else if h1Count > 1 {
+		result.Issues = append(result.Issues, "Multiple H1 tags found (recommended: exactly one)")
+	}
+
+	// Check heading order
+	result.HeadingOrder = checkHeadingOrder(headings)
+	if !result.HeadingOrder {
+		result.Issues = append(result.Issues, "Improper heading hierarchy")
+	}
+
+	// Calculate SEO score (0-100)
+	score := 100
+	if !result.HasTitle {
+		score -= 25
+	}
+	if !result.HasMetaDescription {
+		score -= 20
+	}
+	if result.H1Count != 1 {
+		score -= 15
+	}
+	if !result.HeadingOrder {
+		score -= 10
+	}
+	score -= len(result.Issues) * 5
+
+	result.SEOScore = max(score, 0)
+
+	return result
+}
+
+// checkURLStatus performs a HEAD request to check URL status
+func checkURLStatus(urlStr string, ctx context.Context) (int, error) {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "HEAD", urlStr, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	return resp.StatusCode, nil
+}
+
+// analyzeHeadingStructure analyzes the heading hierarchy
+func analyzeHeadingStructure(headings []map[string]string) string {
+	if len(headings) == 0 {
+		return "No headings found"
+	}
+
+	structure := make([]string, len(headings))
+	for i, heading := range headings {
+		structure[i] = heading["level"]
+	}
+
+	return strings.Join(structure, " → ")
+}
+
+// checkHeadingOrder checks if headings follow proper hierarchy
+func checkHeadingOrder(headings []map[string]string) bool {
+	if len(headings) == 0 {
+		return true
+	}
+
+	prevLevel := 0
+	for _, heading := range headings {
+		level := 1
+		switch heading["level"] {
+		case "h1":
+			level = 1
+		case "h2":
+			level = 2
+		case "h3":
+			level = 3
+		case "h4":
+			level = 4
+		case "h5":
+			level = 5
+		case "h6":
+			level = 6
+		}
+
+		// Allow going to next level or staying at same level or going back
+		// But don't allow skipping levels (e.g., h1 → h3)
+		if prevLevel > 0 && level > prevLevel+1 {
+			return false
+		}
+		prevLevel = level
+	}
+
+	return true
+}
+
+// max helper function
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// performSiteWideQA aggregates QA results from all crawled pages
+func performSiteWideQA(allPages []PageContent, qaOptions QAOptions, ctx context.Context) *SiteWideQAResults {
+	result := &SiteWideQAResults{
+		TotalPagesAnalyzed: len(allPages),
+		PerPageResults:     []PageQAResult{},
+	}
+	
+	if len(allPages) == 0 {
+		return result
+	}
+	
+	fmt.Printf("[SITE-WIDE QA] Processing %d pages for comprehensive QA analysis\n", len(allPages))
+	
+	// Initialize aggregated results
+	if qaOptions.ValidateLinks {
+		result.LinkValidation = &SiteWideLinkResults{
+			BrokenLinksByPage: make(map[string][]BrokenLinkDetail),
+		}
+	}
+	
+	if qaOptions.CheckImages {
+		result.ImageValidation = &SiteWideImageResults{
+			BrokenImagesByPage: make(map[string][]BrokenImageDetail),
+		}
+	}
+	
+	if qaOptions.Accessibility {
+		result.AccessibilityAudit = &SiteWideAccessibility{
+			IssuesByPage: make(map[string][]string),
+		}
+	}
+	
+	if qaOptions.SEOBasics {
+		result.SEOBasics = &SiteWideSEOResults{
+			IssuesByPage: make(map[string][]string),
+		}
+	}
+	
+	// Track unique URLs for link validation
+	uniqueURLsChecked := make(map[string]bool)
+	
+	// Process each page and aggregate results
+	for _, page := range allPages {
+		if page.Error != "" {
+			fmt.Printf("[SITE-WIDE QA] Skipping page with error: %s\n", page.URL)
+			continue
+		}
+		
+		fmt.Printf("[SITE-WIDE QA] Processing page: %s\n", page.URL)
+		
+		// Create page QA result entry
+		pageQAResult := PageQAResult{
+			URL:   page.URL,
+			Title: page.Title,
+		}
+		
+		// If the page already has QA results (from individual processing), use them
+		// Otherwise, we'll need to perform QA analysis now
+		if page.QAResults == nil {
+			// Perform QA analysis for this page
+			// Note: We need to re-fetch the document for QA analysis
+			cfg := config.Load()
+			collyConfig := crawler.CollyConfig{
+				Enabled:            cfg.Colly.Enabled,
+				UserAgent:          cfg.Colly.UserAgent,
+				Delay:              cfg.Colly.Delay,
+				RandomDelay:        cfg.Colly.RandomDelay,
+				Parallelism:        cfg.Colly.Parallelism,
+				DomainGlob:         cfg.Colly.DomainGlob,
+				RespectRobotsTxt:   cfg.Colly.RespectRobotsTxt,
+				AllowURLRevisit:    cfg.Colly.AllowURLRevisit,
+				CacheDir:           cfg.Colly.CacheDir,
+				DebugMode:          cfg.Colly.DebugMode,
+				Async:              cfg.Colly.Async,
+			}
+			
+			fetcher := crawler.NewPageFetcherWithBackend(cfg.Colly.Enabled, collyConfig)
+			doc, err := fetcher.FetchDocument(page.URL, ctx)
+			if err != nil {
+				fmt.Printf("[SITE-WIDE QA] Failed to fetch document for %s: %v\n", page.URL, err)
+				continue
+			}
+			
+			// Perform QA checks on this page
+			page.QAResults = performQAChecks(doc, page, page.URL, qaOptions, ctx)
+		}
+		
+		pageQAResult.QAResults = page.QAResults
+		result.PerPageResults = append(result.PerPageResults, pageQAResult)
+		
+		// Aggregate link validation results
+		if qaOptions.ValidateLinks && page.QAResults.LinkValidation != nil {
+			lv := page.QAResults.LinkValidation
+			result.LinkValidation.TotalLinksFound += lv.TotalLinks
+			result.LinkValidation.TotalValidLinks += lv.ValidLinks
+			result.LinkValidation.TotalBrokenLinks += lv.BrokenLinks
+			result.LinkValidation.TotalExternalLinks += lv.ExternalLinks
+			result.LinkValidation.TotalInternalLinks += lv.InternalLinks
+			
+			// Store broken links by page
+			if len(lv.BrokenDetails) > 0 {
+				result.LinkValidation.BrokenLinksByPage[page.URL] = lv.BrokenDetails
+			}
+			
+			// Track unique URLs (simplified - we'll count all checked URLs)
+			for _, broken := range lv.BrokenDetails {
+				uniqueURLsChecked[broken.URL] = true
+			}
+		}
+		
+		// Aggregate image validation results
+		if qaOptions.CheckImages && page.QAResults.ImageValidation != nil {
+			iv := page.QAResults.ImageValidation
+			result.ImageValidation.TotalImagesFound += iv.TotalImages
+			result.ImageValidation.TotalValidImages += iv.ValidImages
+			result.ImageValidation.TotalBrokenImages += iv.BrokenImages
+			result.ImageValidation.TotalMissingAltText += iv.MissingAltText
+			
+			// Store broken images by page
+			if len(iv.BrokenDetails) > 0 {
+				result.ImageValidation.BrokenImagesByPage[page.URL] = iv.BrokenDetails
+			}
+		}
+		
+		// Aggregate accessibility results
+		if qaOptions.Accessibility && page.QAResults.AccessibilityAudit != nil {
+			acc := page.QAResults.AccessibilityAudit
+			result.AccessibilityAudit.TotalMissingAltTags += acc.MissingAltTags
+			result.AccessibilityAudit.TotalMissingAriaLabels += acc.MissingAriaLabels
+			
+			// Store issues by page
+			if len(acc.Issues) > 0 {
+				result.AccessibilityAudit.IssuesByPage[page.URL] = acc.Issues
+			}
+		}
+		
+		// Aggregate SEO results
+		if qaOptions.SEOBasics && page.QAResults.SEOBasics != nil {
+			seo := page.QAResults.SEOBasics
+			if seo.HasTitle {
+				result.SEOBasics.PagesWithTitle++
+			}
+			if seo.HasMetaDescription {
+				result.SEOBasics.PagesWithMetaDesc++
+			}
+			if seo.H1Count == 1 {
+				result.SEOBasics.PagesWithProperH1++
+			}
+			
+			// Store issues by page
+			if len(seo.Issues) > 0 {
+				result.SEOBasics.IssuesByPage[page.URL] = seo.Issues
+			}
+		}
+	}
+	
+	// Calculate overall scores
+	if qaOptions.ValidateLinks && result.LinkValidation != nil {
+		result.LinkValidation.UniqueURLsChecked = len(uniqueURLsChecked)
+	}
+	
+	if qaOptions.Accessibility && result.AccessibilityAudit != nil {
+		// Calculate overall accessibility score
+		totalIssues := result.AccessibilityAudit.TotalMissingAltTags + result.AccessibilityAudit.TotalMissingAriaLabels
+		for _, issues := range result.AccessibilityAudit.IssuesByPage {
+			totalIssues += len(issues)
+		}
+		
+		if totalIssues == 0 {
+			result.AccessibilityAudit.OverallScore = 100
+		} else {
+			// Simple scoring: start at 100, deduct points for issues
+			score := 100 - min(totalIssues*5, 100)
+			result.AccessibilityAudit.OverallScore = max(score, 0)
+		}
+	}
+	
+	if qaOptions.SEOBasics && result.SEOBasics != nil {
+		// Calculate overall SEO score
+		totalPages := result.TotalPagesAnalyzed
+		if totalPages > 0 {
+			titleScore := (result.SEOBasics.PagesWithTitle * 100) / totalPages
+			metaScore := (result.SEOBasics.PagesWithMetaDesc * 100) / totalPages
+			h1Score := (result.SEOBasics.PagesWithProperH1 * 100) / totalPages
+			
+			// Average the scores
+			result.SEOBasics.OverallSEOScore = (titleScore + metaScore + h1Score) / 3
+		}
+	}
+	
+	fmt.Printf("[SITE-WIDE QA] Site-wide analysis completed\n")
+	if result.LinkValidation != nil {
+		fmt.Printf("[SITE-WIDE QA] Total links found: %d, valid: %d, broken: %d\n", 
+			result.LinkValidation.TotalLinksFound,
+			result.LinkValidation.TotalValidLinks,
+			result.LinkValidation.TotalBrokenLinks)
+	}
+	
+	return result
 }
